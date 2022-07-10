@@ -1,38 +1,102 @@
 version: 2.1
 
+parameters:
+  workflow_id:
+    type: string
+    default: ${CIRCLE_WORKFLOW_ID:0:7}
+
+commands:
+  destroy-environment:
+    description: Destroy AWS provisioned resources on fail
+    steps:
+      - run:
+          name: Destroy environments
+          when: on_fail
+          command: |
+            aws cloudformation delete-stack --stack-name "testec2-<< pipeline.parameters.workflow_id >>"
+
 jobs:
-  test-1:
+  create-infrastructure:
     docker:
-      - image: circleci/node:13.8.0
-    
+      - image: amazon/aws-cli
     steps:
       - checkout
       - run:
-          name: update inventory.txt file
+          name: "Setup EC2 instance"
           command: |
-            pwd | cat >> .circleci/ansible.inventory.txt
-            cat .circleci/ansible/inventory.txt
+            aws cloudformation create-stack \
+              --template-file infra/backend.yml \
+              --tags project=testing \
+              --stack-name "testec2-<< pipeline.parameters.workflow_id >>" \
+              --parameter-overrides ID="<< pipeline.parameters.workflow_id >>"
+
+      - destroy-environment
+
+  update-inventory-file:
+    docker:
+      - image: amazon/aws-cli
+
+    steps:
+      - checkout
+      - run:
+          name: Add back-end ip to ansible inventory
+          command: |
+            aws ec2 describe-instances \
+              --filters Name=tag:Name,Values=testec2-<< pipeline.parameters.workflow_id >> \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --output text | cat >> .circleci/ansible/inventory.txt
+
       - persist_to_workspace:
           root: ~/
           path: project/.circleci/ansible/inventory.txt
-    
-  test-2:
-    docker:
-      - image: circleci/node:13.8.0
 
-    steps:
+      - destroy-environment
+    
+#   test-2:
+#     docker:
+#       - image: circleci/node:13.8.0
+
+#     steps:
+#         - checkout
+#         - attach_workspace:
+#           at: ~/
+#         - run:
+#             name: Check if file was updated
+#             command: |
+#               cat .circleci/ansible/inventory.txt
+
+  configure-infrastructure:
+      docker:
+        - image: python:3.7-alpine3.11
+      steps:
         - checkout
+        - add_ssh_keys:
+            fingerprints: ["1d:83:9d:af:35:e2:5b:9c:ae:3c:89:6b:43:be:ef:4e"] 
+
         - attach_workspace:
-          at: ~/
+            at: ~/
+
         - run:
-            name: Check if file was updated
+            name: Install dependencies
             command: |
-              cat .circleci/ansible/inventory.txt
+              apk add --update tar gzip
+              apk add --update ansible
+              pip3 install --no-cache-dir awscli
+
+        - run:
+            name: Configure server
+            command: |
+              cd .circleci/ansible
+              ansible-playbook -i inventory.txt configure-server.yml
+        
+        - destroy-environment
 
 
 workflows:
   test-workflow:
     jobs:
-      - test-1
+      - create-infrastructure
+      - update-inventory-file
+      - configure-infrastructure
 
 
