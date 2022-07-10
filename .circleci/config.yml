@@ -176,6 +176,7 @@ jobs:
       - run:
           name: Get var
           command: |
+            cat $BASH_ENV
             source $BASH_ENV
             echo $FOO
 
