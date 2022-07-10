@@ -25,21 +25,21 @@ commands:
             aws cloudformation delete-stack --stack-name "testec2-<< pipeline.parameters.workflow_id >>"
 
 jobs:
-  # create-infrastructure:
-  #   docker:
-  #     - image: amazon/aws-cli
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: "Setup EC2 instance"
-  #         command: |
-  #           aws cloudformation deploy \
-  #             --template-file infra/backend.yml \
-  #             --tags project=testing \
-  #             --stack-name "testec2-<< pipeline.parameters.workflow_id >>" \
-  #             --parameter-overrides ID="<< pipeline.parameters.workflow_id >>"
+  create-infrastructure:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: "Setup EC2 instance"
+          command: |
+            aws cloudformation deploy \
+              --template-file infra/backend.yml \
+              --tags project=testing \
+              --stack-name "testec2-<< pipeline.parameters.workflow_id >>" \
+              --parameter-overrides ID="<< pipeline.parameters.workflow_id >>"
 
-  #     - destroy-environment-on-fail
+      - destroy-environment-on-fail
 
   # update-inventory-file:
   #   docker:
@@ -68,25 +68,26 @@ jobs:
 
   #     - destroy-environment-on-fail
 
-  # get-ip-address:
-  #   docker:
-  #     - image: amazon/aws-cli
+  get-ip-address:
+    docker:
+      - image: amazon/aws-cli
 
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: Get EC2 Ip address
-  #         command: |
-  #           BACKEND_IP=$(aws ec2 describe-instances --filters Name=tag:Name,Values=testec2-<< pipeline.parameters.workflow_id >> --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
-  #           echo $BACKEND_IP
-  #           echo "export BACKEND_IP=${BACKEND_IP}" >> $BASH_ENV
-  #     - run:
-  #         name: Check if IP still available
-  #         command: |
-  #           echo ${BACKEND_IP}
+    steps:
+      - checkout
+      - run:
+          name: Get EC2 Ip address
+          command: |
+            echo "export BACKEND_IP=$(aws ec2 describe-instances --filters Name=tag:Name,Values=testec2-<< pipeline.parameters.workflow_id >> --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)" >> ${BASH_ENV}
+            source ${BASH_ENV}
+            echo "This is the backend IP: ${BACKEND_IP}"
+      - run:
+          name: Check if IP still available
+          command: |
+            echo ${BACKEND_IP}
+            exit 1
 
-  #     - destroy-environment-on-fail
-  #     - destroy-environment-on-pass
+      - destroy-environment-on-fail
+      # - destroy-environment-on-pass
 
   # archive-infra-folder:
   #   docker:
@@ -162,23 +163,23 @@ jobs:
   #         command:
   #           npm --version
 
-  job-1:
-    docker:
-      - image: cimg/base:2021.11
-    steps:
-      - run:
-          name: Export a variable
-          command: |
-            FOO="Bar"
-            echo $FOO
-            echo 'export CAMP=$FOO' >> $BASH_ENV
-            source $BASH_ENV
-            echo $CAMP
+  # job-1:
+  #   docker:
+  #     - image: cimg/base:2021.11
+  #   steps:
+  #     - run:
+  #         name: Export a variable
+  #         command: |
+  #           FOO="Bar"
+  #           echo $FOO
+  #           echo 'export CAMP=$FOO' >> $BASH_ENV
+  #           source $BASH_ENV
+  #           echo $CAMP
 
-      - run:
-          name: Get var
-          command: |
-            echo $CAMP
+  #     - run:
+  #         name: Get var
+  #         command: |
+  #           echo $CAMP
 
   # job-2:
   #   docker:
@@ -196,7 +197,7 @@ workflows:
   test-workflow:
     jobs:
       # - check-image
-      # - create-infrastructure
+      - create-infrastructure
       # - update-inventory-file:
       #     requires:
       #       - create-infrastructure
@@ -206,12 +207,12 @@ workflows:
       # - archive-infra-folder:
       #     requires:
       #       - update-inventory-file
-      - job-1
+      # - job-1
       # - job-2:
       #     requires:
       #       - job-1
-      # - get-ip-address:
-      #     requires:
-      #       - create-infrastructure
+      - get-ip-address:
+          requires:
+            - create-infrastructure
 
 
