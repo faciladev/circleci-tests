@@ -151,6 +151,10 @@ jobs:
           command: |
             export FOO="Bar"
             echo "${FOO}"
+            if [[ `echo ${FOO} == "Bar"` ]];
+            then echo "Persisted across jobs";
+            else echo "Not persisted across jobs";
+            fi
 
   job-2:
     docker:
