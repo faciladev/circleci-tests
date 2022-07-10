@@ -13,6 +13,8 @@ jobs:
             sudo apt install python3-pip
             pip3 --version
             pip3 install awscli
+            sudo apt-get -y install gzip tar
+
 
 workflows:
   test-workflow:
