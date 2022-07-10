@@ -177,8 +177,6 @@ jobs:
           name: Get var
           command: |
             cat $BASH_ENV
-            source $BASH_ENV
-            echo $FOO
 
   # job-2:
   #   docker:
