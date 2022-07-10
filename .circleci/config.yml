@@ -1,17 +1,23 @@
 version: 2.1
 
 jobs:
-  docker:
-    - image: circleci/node:13.8.0
-  
-  steps:
-    - checkout
-    - run:
-        name: Install dependencies
-        command: |
-          apt update
-          apt install python3-pip
-          pip3 --version
-          pip install awscli
+  test-1:
+    docker:
+      - image: circleci/node:13.8.0
+    
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            apt update
+            apt install python3-pip
+            pip3 --version
+            pip install awscli
+
+workflows:
+  test-workflow:
+    jobs:
+      - test-1
 
 
