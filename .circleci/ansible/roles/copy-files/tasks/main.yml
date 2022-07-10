@@ -12,7 +12,7 @@
 
 - name: List files in directory
   shell: |
-    pwd
-    ls
+    cat backend.yml
   args:
+    chdir: project/
     executable: /bin/bash
