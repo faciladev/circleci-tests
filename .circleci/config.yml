@@ -68,24 +68,25 @@ jobs:
 
   #     - destroy-environment-on-fail
 
-  get-ip-address:
-    docker:
-      - image: amazon/aws-cli
+  # get-ip-address:
+  #   docker:
+  #     - image: amazon/aws-cli
 
-    steps:
-      - checkout
-      - run:
-          name: Get EC2 Ip address
-          command: |
-            export BACKEND_IP=$(aws ec2 describe-instances --filters Name=tag:Name,Values=testec2-<< pipeline.parameters.workflow_id >> --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
-            echo ${BACKEND_IP}
-      - run:
-          name: Check if IP still available
-          command: |
-            echo ${BACKEND_IP}
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Get EC2 Ip address
+  #         command: |
+  #           BACKEND_IP=$(aws ec2 describe-instances --filters Name=tag:Name,Values=testec2-<< pipeline.parameters.workflow_id >> --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+  #           echo $BACKEND_IP
+  #           echo "export BACKEND_IP=${BACKEND_IP}" >> $BASH_ENV
+  #     - run:
+  #         name: Check if IP still available
+  #         command: |
+  #           echo ${BACKEND_IP}
 
-      - destroy-environment-on-fail
-      - destroy-environment-on-pass
+  #     - destroy-environment-on-fail
+  #     - destroy-environment-on-pass
 
   # archive-infra-folder:
   #   docker:
@@ -161,19 +162,20 @@ jobs:
   #         command:
   #           npm --version
 
-  # job-1:
-  #   docker:
-  #     - image: alpine:latest
-  #   steps:
-  #     - run:
-  #         name: Export a variable
-  #         command: |
-  #           export FOO="Bar"
-  #           echo "${FOO}"
-  #           if [[ `echo ${FOO} == "Bar"` ]];
-  #           then echo "Persisted across jobs";
-  #           else echo "Not persisted across jobs";
-  #           fi
+  job-1:
+    docker:
+      - image: alpine:latest
+    steps:
+      - run:
+          name: Export a variable
+          command: |
+            FOO="Bar"
+            echo $FOO
+            echo "export FOO=$FOO" >> BASH_ENV
+
+      - run:
+          name: Get var
+          command: echo $FOO
 
   # job-2:
   #   docker:
@@ -201,12 +203,12 @@ workflows:
       # - archive-infra-folder:
       #     requires:
       #       - update-inventory-file
-      # - job-1
+      - job-1
       # - job-2:
       #     requires:
       #       - job-1
-      - get-ip-address:
-          requires:
-            - create-infrastructure
+      # - get-ip-address:
+      #     requires:
+      #       - create-infrastructure
 
 
