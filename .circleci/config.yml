@@ -6,7 +6,7 @@ parameters:
     default: ${CIRCLE_WORKFLOW_ID:0:7}
 
 commands:
-  destroy-environment:
+  destroy-environment-on-fail:
     description: Destroy AWS provisioned resources on fail
     steps:
       - run:
@@ -39,7 +39,7 @@ jobs:
               --stack-name "testec2-<< pipeline.parameters.workflow_id >>" \
               --parameter-overrides ID="<< pipeline.parameters.workflow_id >>"
 
-      - destroy-environment
+      - destroy-environment-on-fail
 
   update-inventory-file:
     docker:
@@ -66,12 +66,11 @@ jobs:
           paths:
             - project/.circleci/ansible/inventory.txt
 
-      - destroy-environment
+      - destroy-environment-on-fail
 
   archive-infra-folder:
     docker:
       - image: cimg/python:3.7.13
-    
     steps:
       - checkout
       - add_ssh_keys:
@@ -86,6 +85,9 @@ jobs:
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
             ansible-playbook -i inventory.txt unarchive-infra.yml
+
+      - destroy-environment-on-fail
+      - destroy-environment-on-pass
     
 #   test-2:
 #     docker:
@@ -123,7 +125,7 @@ jobs:
   #             cd .circleci/ansible
   #             ansible-playbook -i inventory.txt configure-server.yml
         
-  #       - destroy-environment
+  #       - destroy-environment-on-fail
   #       - destroy-environment-on-pass
 
   # check-image:
@@ -141,13 +143,16 @@ jobs:
 workflows:
   test-workflow:
     jobs:
-      - check-image
-      # - create-infrastructure
-      # - update-inventory-file:
-      #     requires:
-      #       - create-infrastructure
+      # - check-image
+      - create-infrastructure
+      - update-inventory-file:
+          requires:
+            - create-infrastructure
       # - configure-infrastructure:
       #     requires:
       #       - update-inventory-file
+      - archive-infra-folder:
+          requires:
+            - update-inventory-file
 
 
