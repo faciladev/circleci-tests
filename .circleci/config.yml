@@ -81,12 +81,10 @@ jobs:
           name: Install AWSCLI
           command: |
             pip3 install awscli
-            pip3 install ansiblw
+            pip3 install ansible
       - run:
           name: Archive folder
           command: |
-            pwd
-            ls
             tar -C infra -czvf artifact.tar.gz .
             cd .circleci/ansible
             ansible-playbook -i inventory.txt unarchive-infra.yml
