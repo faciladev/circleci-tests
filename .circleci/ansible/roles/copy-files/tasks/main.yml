@@ -21,4 +21,4 @@
 
 - name: Show results
   debug:
-    var: shell_result.output
+    msg: {{ shell_result }}
