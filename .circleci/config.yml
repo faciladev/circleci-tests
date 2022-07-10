@@ -164,7 +164,7 @@ jobs:
 
   job-1:
     docker:
-      - image: alpine:latest
+      - image: cimg/python:3.8.13
     steps:
       - run:
           name: Export a variable
