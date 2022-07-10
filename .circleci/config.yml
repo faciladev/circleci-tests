@@ -164,18 +164,20 @@ jobs:
 
   job-1:
     docker:
-      - image: cimg/python:3.8.13
+      - image: cimg/base:2021.11
     steps:
       - run:
           name: Export a variable
           command: |
             FOO="Bar"
             echo $FOO
-            echo 'export FOO=$(echo $FOO)' >> $BASH_ENV
+            echo 'export FOO=$FOO' >> $BASH_ENV
 
       - run:
           name: Get var
-          command: echo $FOO
+          command: |
+            source $BASH_ENV
+            echo $FOO
 
   # job-2:
   #   docker:
