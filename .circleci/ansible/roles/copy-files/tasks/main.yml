@@ -7,7 +7,7 @@
 
 - name: Copy files
   unarchive:
-    src: ./artifact.tar.gz
+    src: ~/circleci/project/artifact.tar.gz
     dest: ~/project
 
 - name: List files in directory

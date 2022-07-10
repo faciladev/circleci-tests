@@ -78,7 +78,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          name: Install AWSCLI
+          name: Install AWSCLI and Ansible
           command: |
             pip3 install awscli
             pip3 install ansible
