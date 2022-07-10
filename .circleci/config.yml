@@ -24,7 +24,7 @@ jobs:
       - run:
           name: "Setup EC2 instance"
           command: |
-            aws cloudformation create-stack \
+            aws cloudformation deploy \
               --template-file infra/backend.yml \
               --tags project=testing \
               --stack-name "testec2-<< pipeline.parameters.workflow_id >>" \
