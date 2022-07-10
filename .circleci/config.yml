@@ -25,72 +25,72 @@ commands:
             aws cloudformation delete-stack --stack-name "testec2-<< pipeline.parameters.workflow_id >>"
 
 jobs:
-  create-infrastructure:
-    docker:
-      - image: amazon/aws-cli
-    steps:
-      - checkout
-      - run:
-          name: "Setup EC2 instance"
-          command: |
-            aws cloudformation deploy \
-              --template-file infra/backend.yml \
-              --tags project=testing \
-              --stack-name "testec2-<< pipeline.parameters.workflow_id >>" \
-              --parameter-overrides ID="<< pipeline.parameters.workflow_id >>"
+  # create-infrastructure:
+  #   docker:
+  #     - image: amazon/aws-cli
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: "Setup EC2 instance"
+  #         command: |
+  #           aws cloudformation deploy \
+  #             --template-file infra/backend.yml \
+  #             --tags project=testing \
+  #             --stack-name "testec2-<< pipeline.parameters.workflow_id >>" \
+  #             --parameter-overrides ID="<< pipeline.parameters.workflow_id >>"
 
-      - destroy-environment-on-fail
+  #     - destroy-environment-on-fail
 
-  update-inventory-file:
-    docker:
-      - image: amazon/aws-cli
+  # update-inventory-file:
+  #   docker:
+  #     - image: amazon/aws-cli
 
-    steps:
-      - checkout
-      - run:
-          name: Install tar and gzip
-          command: |
-            yum install -y tar gzip
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Install tar and gzip
+  #         command: |
+  #           yum install -y tar gzip
 
-      - run:
-          name: Add back-end ip to ansible inventory
-          command: |
-            aws ec2 describe-instances \
-              --filters Name=tag:Name,Values=testec2-<< pipeline.parameters.workflow_id >> \
-              --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --output text | cat >> .circleci/ansible/inventory.txt
-            cat .circleci/ansible/inventory.txt
+  #     - run:
+  #         name: Add back-end ip to ansible inventory
+  #         command: |
+  #           aws ec2 describe-instances \
+  #             --filters Name=tag:Name,Values=testec2-<< pipeline.parameters.workflow_id >> \
+  #             --query 'Reservations[*].Instances[*].PublicIpAddress' \
+  #             --output text | cat >> .circleci/ansible/inventory.txt
+  #           cat .circleci/ansible/inventory.txt
 
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - project/.circleci/ansible/inventory.txt
+  #     - persist_to_workspace:
+  #         root: ~/
+  #         paths:
+  #           - project/.circleci/ansible/inventory.txt
 
-      - destroy-environment-on-fail
+  #     - destroy-environment-on-fail
 
-  archive-infra-folder:
-    docker:
-      - image: cimg/python:3.7.13
-    steps:
-      - checkout
-      - add_ssh_keys:
-          fingerprints: ["1d:83:9d:af:35:e2:5b:9c:ae:3c:89:6b:43:be:ef:4e"]
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Install AWSCLI and Ansible
-          command: |
-            pip3 install awscli
-            pip3 install ansible
-      - run:
-          name: Archive folder
-          command: |
-            tar -C infra -czvf artifact.tar.gz .
-            cd .circleci/ansible
-            ansible-playbook -i inventory.txt unarchive-infra.yml
+  # archive-infra-folder:
+  #   docker:
+  #     - image: cimg/python:3.7.13
+  #   steps:
+  #     - checkout
+  #     - add_ssh_keys:
+  #         fingerprints: ["1d:83:9d:af:35:e2:5b:9c:ae:3c:89:6b:43:be:ef:4e"]
+  #     - attach_workspace:
+  #         at: ~/
+  #     - run:
+  #         name: Install AWSCLI and Ansible
+  #         command: |
+  #           pip3 install awscli
+  #           pip3 install ansible
+  #     - run:
+  #         name: Archive folder
+  #         command: |
+  #           tar -C infra -czvf artifact.tar.gz .
+  #           cd .circleci/ansible
+  #           ansible-playbook -i inventory.txt unarchive-infra.yml
 
-      - destroy-environment-on-fail
-      - destroy-environment-on-pass
+  #     - destroy-environment-on-fail
+  #     - destroy-environment-on-pass
     
 #   test-2:
 #     docker:
@@ -142,20 +142,42 @@ jobs:
   #         command:
   #           npm --version
 
+  job-1:
+    docker:
+      - image: alpine:latest
+    steps:
+      - run:
+          name: Export a variable
+          command: |
+            export FOO="Bar"
+            echo "${FOO}"
+
+  job-2:
+    docker:
+      - image: alpine:latest
+    steps:
+      - run:
+          name: Retrieve previously exported variable
+          command: |
+            echo "${FOO}"
 
 workflows:
   test-workflow:
     jobs:
       # - check-image
-      - create-infrastructure
-      - update-inventory-file:
-          requires:
-            - create-infrastructure
+      # - create-infrastructure
+      # - update-inventory-file:
+      #     requires:
+      #       - create-infrastructure
       # - configure-infrastructure:
       #     requires:
       #       - update-inventory-file
-      - archive-infra-folder:
+      # - archive-infra-folder:
+      #     requires:
+      #       - update-inventory-file
+      - job-1
+      - job-2:
           requires:
-            - update-inventory-file
+            - job-1
 
 
