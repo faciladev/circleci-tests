@@ -159,8 +159,10 @@ jobs:
       - run:
           name: Retrieve previously exported variable
           command: |
-            echo "${FOO}"
-            ENV
+            if [[ `echo ${FOO} == "Bar"` ]];
+            then echo "Persisted across jobs";
+            else echo "Not persisted across jobs";
+            fi
 
 workflows:
   test-workflow:
