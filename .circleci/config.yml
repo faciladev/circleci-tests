@@ -77,7 +77,7 @@ jobs:
       - run:
           name: Get EC2 Ip address
           command: |
-            export BACKEND_IP=$(aws ec2 describe-instances --filters Name=tag:Name,Values=backend-<< pipeline.parameters.workflow_id >> --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+            export BACKEND_IP=$(aws ec2 describe-instances --filters Name=tag:Name,Values=testec2-<< pipeline.parameters.workflow_id >> --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
             echo ${BACKEND_IP}
       - run:
           name: Check if IP still available
