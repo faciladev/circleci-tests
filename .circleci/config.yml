@@ -175,7 +175,7 @@ jobs:
 
       - run:
           name: Get var
-          command: echo $FOO
+          command: echo ${FOO}
 
   # job-2:
   #   docker:
