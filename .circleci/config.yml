@@ -25,21 +25,21 @@ commands:
             aws cloudformation delete-stack --stack-name "testec2-<< pipeline.parameters.workflow_id >>"
 
 jobs:
-  # create-infrastructure:
-  #   docker:
-  #     - image: amazon/aws-cli
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: "Setup EC2 instance"
-  #         command: |
-  #           aws cloudformation deploy \
-  #             --template-file infra/backend.yml \
-  #             --tags project=testing \
-  #             --stack-name "testec2-<< pipeline.parameters.workflow_id >>" \
-  #             --parameter-overrides ID="<< pipeline.parameters.workflow_id >>"
+  create-infrastructure:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: "Setup EC2 instance"
+          command: |
+            aws cloudformation deploy \
+              --template-file infra/backend.yml \
+              --tags project=testing \
+              --stack-name "testec2-<< pipeline.parameters.workflow_id >>" \
+              --parameter-overrides ID="<< pipeline.parameters.workflow_id >>"
 
-  #     - destroy-environment-on-fail
+      - destroy-environment-on-fail
 
   # update-inventory-file:
   #   docker:
@@ -67,6 +67,28 @@ jobs:
   #           - project/.circleci/ansible/inventory.txt
 
   #     - destroy-environment-on-fail
+
+  get-ip-address:
+    docker:
+      - image: amazon/aws-cli
+
+    steps:
+      - checkout
+      - run:
+          name: Get EC2 Ip address
+          command: |
+            export BACKEND_IP=$(aws ec2 describe-instances \
+              --filters Name=tag:Name,Values=backend-<< pipeline.parameters.workflow_id >> \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --output text)
+            echo ${BACKEND_IP}
+      - run:
+          name: Check if IP still available
+          command: |
+            echo ${BACKEND_IP}
+
+      - destroy-environment-on-fail
+      - destroy-environment-on-pass
 
   # archive-infra-folder:
   #   docker:
@@ -142,37 +164,37 @@ jobs:
   #         command:
   #           npm --version
 
-  job-1:
-    docker:
-      - image: alpine:latest
-    steps:
-      - run:
-          name: Export a variable
-          command: |
-            export FOO="Bar"
-            echo "${FOO}"
-            if [[ `echo ${FOO} == "Bar"` ]];
-            then echo "Persisted across jobs";
-            else echo "Not persisted across jobs";
-            fi
+  # job-1:
+  #   docker:
+  #     - image: alpine:latest
+  #   steps:
+  #     - run:
+  #         name: Export a variable
+  #         command: |
+  #           export FOO="Bar"
+  #           echo "${FOO}"
+  #           if [[ `echo ${FOO} == "Bar"` ]];
+  #           then echo "Persisted across jobs";
+  #           else echo "Not persisted across jobs";
+  #           fi
 
-  job-2:
-    docker:
-      - image: alpine:latest
-    steps:
-      - run:
-          name: Retrieve previously exported variable
-          command: |
-            if [[ `echo ${FOO} == "Bar"` ]];
-            then echo "Persisted across jobs";
-            else echo "Not persisted across jobs";
-            fi
+  # job-2:
+  #   docker:
+  #     - image: alpine:latest
+  #   steps:
+  #     - run:
+  #         name: Retrieve previously exported variable
+  #         command: |
+  #           if [[ `echo ${FOO} == "Bar"` ]];
+  #           then echo "Persisted across jobs";
+  #           else echo "Not persisted across jobs";
+  #           fi
 
 workflows:
   test-workflow:
     jobs:
       # - check-image
-      # - create-infrastructure
+      - create-infrastructure
       # - update-inventory-file:
       #     requires:
       #       - create-infrastructure
@@ -182,9 +204,12 @@ workflows:
       # - archive-infra-folder:
       #     requires:
       #       - update-inventory-file
-      - job-1
-      - job-2:
+      # - job-1
+      # - job-2:
+      #     requires:
+      #       - job-1
+      - get-ip-address:
           requires:
-            - job-1
+            - create-infrastructure
 
 
