@@ -83,7 +83,7 @@ jobs:
 
   configure-infrastructure:
       docker:
-        - image: python:3.7-alpine3.11
+        - image: cimg/python:3.7.13
       steps:
         - checkout
         - add_ssh_keys:
@@ -95,8 +95,7 @@ jobs:
         - run:
             name: Install dependencies
             command: |
-              apk add --update tar gzip
-              apk add --update ansible
+              pip3 install ansible
               pip3 install --no-cache-dir awscli
 
         - run:
