@@ -1,0 +1,13 @@
+---
+
+- name: Make directory
+  become: true
+  file:
+    path: ~/project
+    state: directory
+
+- name: Copy files
+  become: true
+  unarchive:
+    src: ./artifact.tar.gz
+    dest: ~/project

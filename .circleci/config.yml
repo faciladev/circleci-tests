@@ -25,48 +25,67 @@ commands:
             aws cloudformation delete-stack --stack-name "testec2-<< pipeline.parameters.workflow_id >>"
 
 jobs:
-  # create-infrastructure:
-  #   docker:
-  #     - image: amazon/aws-cli
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: "Setup EC2 instance"
-  #         command: |
-  #           aws cloudformation deploy \
-  #             --template-file infra/backend.yml \
-  #             --tags project=testing \
-  #             --stack-name "testec2-<< pipeline.parameters.workflow_id >>" \
-  #             --parameter-overrides ID="<< pipeline.parameters.workflow_id >>"
+  create-infrastructure:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: "Setup EC2 instance"
+          command: |
+            aws cloudformation deploy \
+              --template-file infra/backend.yml \
+              --tags project=testing \
+              --stack-name "testec2-<< pipeline.parameters.workflow_id >>" \
+              --parameter-overrides ID="<< pipeline.parameters.workflow_id >>"
 
-  #     - destroy-environment
+      - destroy-environment
 
-  # update-inventory-file:
-  #   docker:
-  #     - image: amazon/aws-cli
+  update-inventory-file:
+    docker:
+      - image: amazon/aws-cli
 
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: Install tar and gzip
-  #         command: |
-  #           yum install -y tar gzip
+    steps:
+      - checkout
+      - run:
+          name: Install tar and gzip
+          command: |
+            yum install -y tar gzip
 
-  #     - run:
-  #         name: Add back-end ip to ansible inventory
-  #         command: |
-  #           aws ec2 describe-instances \
-  #             --filters Name=tag:Name,Values=testec2-<< pipeline.parameters.workflow_id >> \
-  #             --query 'Reservations[*].Instances[*].PublicIpAddress' \
-  #             --output text | cat >> .circleci/ansible/inventory.txt
-  #           cat .circleci/ansible/inventory.txt
+      - run:
+          name: Add back-end ip to ansible inventory
+          command: |
+            aws ec2 describe-instances \
+              --filters Name=tag:Name,Values=testec2-<< pipeline.parameters.workflow_id >> \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --output text | cat >> .circleci/ansible/inventory.txt
+            cat .circleci/ansible/inventory.txt
 
-  #     - persist_to_workspace:
-  #         root: ~/
-  #         paths:
-  #           - project/.circleci/ansible/inventory.txt
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/ansible/inventory.txt
 
-  #     - destroy-environment
+      - destroy-environment
+
+  archive-infra-folder:
+    docker:
+      - image: cimg/python:3.7.13
+    
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["1d:83:9d:af:35:e2:5b:9c:ae:3c:89:6b:43:be:ef:4e"]
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Archive folder
+          command: |
+            tar -C infra -czvf artifact.tar.gz .
+            cd .circleci/ansible
+            echo "Contents  of the inventory.txt file is -------"
+            cat inventory.txt
+            ansible-playbook -i inventory.txt unarchive-infra.yml
     
 #   test-2:
 #     docker:
@@ -107,16 +126,16 @@ jobs:
   #       - destroy-environment
   #       - destroy-environment-on-pass
 
-  check-image:
-    docker:
-      - image: cimg/python:3.8.13-node
+  # check-image:
+  #   docker:
+  #     - image: cimg/python:3.8.13-node
 
-    steps:
-      - checkout
-      - run:
-          name: Check if npm exists
-          command:
-            npm --version
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Check if npm exists
+  #         command:
+  #           npm --version
 
 
 workflows:
