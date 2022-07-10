@@ -15,11 +15,12 @@
   shell: |
     pwd
     ls
-    ls ~/project
+    cd ~/project
+    pwd
   args:
     executable: /bin/bash
   register: shell_result
 
 - name: Show results
   debug:
-    msg: "{{ shell_result }}"
+    msg: "{{ shell_result.stdout_lines }}"
