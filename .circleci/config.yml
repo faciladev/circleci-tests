@@ -171,13 +171,14 @@ jobs:
           command: |
             FOO="Bar"
             echo $FOO
-            echo 'export FOO=$FOO' >> $BASH_ENV
+            echo 'export CAMP=$FOO' >> $BASH_ENV
             source $BASH_ENV
+            echo $CAMP
 
       - run:
           name: Get var
           command: |
-            echo ${FOO}
+            echo $CAMP
 
   # job-2:
   #   docker:
