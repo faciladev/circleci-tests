@@ -160,6 +160,7 @@ jobs:
           name: Retrieve previously exported variable
           command: |
             echo "${FOO}"
+            ENV
 
 workflows:
   test-workflow:
