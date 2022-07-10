@@ -20,7 +20,7 @@ commands:
     steps:
       - run:
           name: Destroy environments
-          when: on_pass
+          when: on_success
           command: |
             aws cloudformation delete-stack --stack-name "testec2-<< pipeline.parameters.workflow_id >>"
 
@@ -62,7 +62,7 @@ jobs:
 
       - persist_to_workspace:
           root: ~/
-          path:
+          paths:
             - project/.circleci/ansible/inventory.txt
 
       - destroy-environment
