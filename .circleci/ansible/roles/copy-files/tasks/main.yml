@@ -10,9 +10,15 @@
     src: ~/project/artifact.tar.gz
     dest: ~/project
 
+
 - name: List files in directory
   shell: |
-    cat backend.yml
+    pwd
+    ls
   args:
-    chdir: ~/project/
     executable: /bin/bash
+  register: shell_result
+
+- name: Show results
+  debug:
+    var: shell_result.output
