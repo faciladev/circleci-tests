@@ -25,21 +25,21 @@ commands:
             aws cloudformation delete-stack --stack-name "testec2-<< pipeline.parameters.workflow_id >>"
 
 jobs:
-  create-infrastructure:
-    docker:
-      - image: amazon/aws-cli
-    steps:
-      - checkout
-      - run:
-          name: "Setup EC2 instance"
-          command: |
-            aws cloudformation deploy \
-              --template-file infra/backend.yml \
-              --tags project=testing \
-              --stack-name "testec2-<< pipeline.parameters.workflow_id >>" \
-              --parameter-overrides ID="<< pipeline.parameters.workflow_id >>"
+  # create-infrastructure:
+  #   docker:
+  #     - image: amazon/aws-cli
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: "Setup EC2 instance"
+  #         command: |
+  #           aws cloudformation deploy \
+  #             --template-file infra/backend.yml \
+  #             --tags project=testing \
+  #             --stack-name "testec2-<< pipeline.parameters.workflow_id >>" \
+  #             --parameter-overrides ID="<< pipeline.parameters.workflow_id >>"
 
-      - destroy-environment-on-fail
+  #     - destroy-environment-on-fail
 
   # update-inventory-file:
   #   docker:
@@ -171,7 +171,7 @@ jobs:
           command: |
             FOO="Bar"
             echo $FOO
-            echo "export FOO=$FOO" >> BASH_ENV
+            echo "export FOO=${FOO}" >> BASH_ENV
 
       - run:
           name: Get var
@@ -193,7 +193,7 @@ workflows:
   test-workflow:
     jobs:
       # - check-image
-      - create-infrastructure
+      # - create-infrastructure
       # - update-inventory-file:
       #     requires:
       #       - create-infrastructure
