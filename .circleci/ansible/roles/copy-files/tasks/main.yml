@@ -14,5 +14,5 @@
   shell: |
     cat backend.yml
   args:
-    chdir: project/
+    chdir: ~/project/
     executable: /bin/bash
