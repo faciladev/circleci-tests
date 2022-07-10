@@ -171,7 +171,7 @@ jobs:
           command: |
             FOO="Bar"
             echo $FOO
-            echo "export FOO=${FOO}" >> $BASH_ENV
+            echo "export FOO=$FOO" >> $BASH_ENV
 
       - run:
           name: Get var
