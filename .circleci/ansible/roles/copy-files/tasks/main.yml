@@ -21,8 +21,9 @@
 - name: List files in directory
   shell: |
     echo "This is the home dir: $(echo ~/)"
+    echo "HOME DIR: $(echo ${HOME})"
     echo "This is the pwd: $(pwd)"
-    cd /home/ubuntu/project
+    cd /home/ubuntu/backend
     echo "This is the working dir after cd : $(pwd)"
     echo "This is the listed project directory: $(ls)"
   args:
