@@ -5,12 +5,12 @@
     path: /home/ubuntu/backend
     state: directory
 
-- name: Print Env Vars
-  shell: |
-    printenv
-    printenv > /home/ubuntu/backend/.env
-    cat /home/ubuntu/backend/.env
-  register: env_result
+# - name: Print Env Vars
+#   shell: |
+#     printenv
+#     printenv > /home/ubuntu/backend/.env
+#     cat /home/ubuntu/backend/.env
+#   register: env_result
 
 # - name: show proj vars
 #   debug:
@@ -38,8 +38,8 @@
   debug:
     msg: "{{ shell_result.stdout_lines }}"
 
-- name: Environment result
-  debug:
-    msg: "{{ env_result.stdout_lines }}"
+# - name: Environment result
+#   debug:
+#     msg: "{{ env_result.stdout_lines }}"
 
 
