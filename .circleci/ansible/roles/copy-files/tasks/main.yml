@@ -12,6 +12,10 @@
     cat /home/ubuntu/backend/.env
   register: env_result
 
+- name: show proj vars
+  debug:
+    msg: "{{ ansible_env }}"
+
 
 - name: Copy files
   unarchive:
