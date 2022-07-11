@@ -107,7 +107,7 @@ jobs:
           command: |
             printenv
             printenv > ./infra/.env
-            echo "before zip: $(ls ./infra)"
+            echo "before zip: $(ls ./infra -a)"
             tar -C infra -czvf artifact.tar.gz .
             cd .circleci/ansible
             ansible-playbook -i inventory.txt unarchive-infra.yml
