@@ -12,9 +12,9 @@
     cat /home/ubuntu/backend/.env
   register: env_result
 
-- name: show proj vars
-  debug:
-    msg: " This is shell {{ SHELL }}"
+# - name: show proj vars
+#   debug:
+#     msg: " This is shell {{ SHELL }}"
 
 
 - name: Copy files
