@@ -21,10 +21,10 @@
       raw: test -e /usr/bin/python3 || (apt -y update && apt install -y python3)
       changed_when: false
 
-  # environment:
-  #   - SHELL: "CAMP"
-  #   - KOUN: "MAN"
-  #   - FOO: "BAR"
+  environment:
+    - SHELL: "CAMP"
+    - KOUN: "MAN"
+    - FOO: "BAR"
 
   roles:
     - copy-files
