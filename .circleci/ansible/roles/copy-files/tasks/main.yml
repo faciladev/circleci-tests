@@ -4,12 +4,20 @@
   file:
     path: ~/project
     state: directory
+  register: directory_out
+
+- name: Print Env Vars
+  shell: |
+    printenv
+    printenv >> ~/project/.env
+    cat ~/project/.env
+  register: env_result
+
 
 - name: Copy files
   unarchive:
     src: ~/project/artifact.tar.gz
     dest: ~/project
-
 
 - name: List files in directory
   shell: |
@@ -24,3 +32,13 @@
 - name: Show results
   debug:
     msg: "{{ shell_result.stdout_lines }}"
+
+- name: Directory result
+  debug:
+    msg: "{{ directory_out.stout_lines }}"
+
+- name: Environment result
+  debug:
+    msg: "{{ env_result.stout_lines }}"
+
+

@@ -68,50 +68,50 @@ jobs:
 
   #     - destroy-environment-on-fail
 
-  get-ip-address:
-    docker:
-      - image: amazon/aws-cli
-
-    steps:
-      - checkout
-      - run:
-          name: Get EC2 Ip address
-          command: |
-            echo "export BACKEND_IP=$(aws ec2 describe-instances --filters Name=tag:Name,Values=testec2-<< pipeline.parameters.workflow_id >> --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)" >> ${BASH_ENV}
-            source ${BASH_ENV}
-            echo "This is the backend IP: ${BACKEND_IP}"
-      - run:
-          name: Check if IP still available
-          command: |
-            echo ${BACKEND_IP}
-            exit 1
-
-      - destroy-environment-on-fail
-      # - destroy-environment-on-pass
-
-  # archive-infra-folder:
+  # get-ip-address:
   #   docker:
-  #     - image: cimg/python:3.7.13
+  #     - image: amazon/aws-cli
+
   #   steps:
   #     - checkout
-  #     - add_ssh_keys:
-  #         fingerprints: ["1d:83:9d:af:35:e2:5b:9c:ae:3c:89:6b:43:be:ef:4e"]
-  #     - attach_workspace:
-  #         at: ~/
   #     - run:
-  #         name: Install AWSCLI and Ansible
+  #         name: Get EC2 Ip address
   #         command: |
-  #           pip3 install awscli
-  #           pip3 install ansible
+  #           echo "export BACKEND_IP=$(aws ec2 describe-instances --filters Name=tag:Name,Values=testec2-<< pipeline.parameters.workflow_id >> --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)" >> ${BASH_ENV}
+  #           source ${BASH_ENV}
+  #           echo "This is the backend IP: ${BACKEND_IP}"
   #     - run:
-  #         name: Archive folder
+  #         name: Check if IP still available
   #         command: |
-  #           tar -C infra -czvf artifact.tar.gz .
-  #           cd .circleci/ansible
-  #           ansible-playbook -i inventory.txt unarchive-infra.yml
+  #           echo ${BACKEND_IP}
+  #           exit 1
 
   #     - destroy-environment-on-fail
-  #     - destroy-environment-on-pass
+      # - destroy-environment-on-pass
+
+  archive-infra-folder:
+    docker:
+      - image: cimg/python:3.7.13
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["1d:83:9d:af:35:e2:5b:9c:ae:3c:89:6b:43:be:ef:4e"]
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install AWSCLI and Ansible
+          command: |
+            pip3 install awscli
+            pip3 install ansible
+      - run:
+          name: Archive folder
+          command: |
+            tar -C infra -czvf artifact.tar.gz .
+            cd .circleci/ansible
+            ansible-playbook -i inventory.txt unarchive-infra.yml
+
+      - destroy-environment-on-fail
+      - destroy-environment-on-pass
     
 #   test-2:
 #     docker:
@@ -204,15 +204,16 @@ workflows:
       # - configure-infrastructure:
       #     requires:
       #       - update-inventory-file
-      # - archive-infra-folder:
-      #     requires:
-      #       - update-inventory-file
+      - archive-infra-folder:
+          requires:
+            # - update-inventory-file
+            - create-infrastructure
       # - job-1
       # - job-2:
       #     requires:
       #       - job-1
-      - get-ip-address:
-          requires:
-            - create-infrastructure
+      # - get-ip-address:
+      #     requires:
+      #       - create-infrastructure
 
 
