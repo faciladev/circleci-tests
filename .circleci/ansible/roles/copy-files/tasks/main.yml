@@ -16,7 +16,7 @@
 
 - name: Copy files
   unarchive:
-    src: ~/project/artifact.tar.gz
+    src: ../../artifact.tar.gz
     dest: ~/project
 
 - name: List files in directory

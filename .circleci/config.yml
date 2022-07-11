@@ -90,7 +90,7 @@ jobs:
 
   archive-infra-folder:
     docker:
-      - image: cimg/python:3.7.13
+      - image: cimg/python:3.8.13
     steps:
       - checkout
       - add_ssh_keys:
