@@ -17,7 +17,7 @@
 - name: Copy files
   unarchive:
     src: ../../artifact.tar.gz
-    dest: /home/ubuntu/project
+    dest: /home/ubuntu/backend
 
 - name: List files in directory
   shell: |
