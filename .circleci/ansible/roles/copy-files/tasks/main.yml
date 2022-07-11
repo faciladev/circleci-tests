@@ -14,7 +14,7 @@
 
 - name: show proj vars
   debug:
-    msg: "{{ ansible_env }}"
+    msg: " This is shell {{ SHELL }}"
 
 
 - name: Copy files
