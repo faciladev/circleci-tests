@@ -9,8 +9,8 @@
 - name: Print Env Vars
   shell: |
     printenv
-    printenv >> ~/project/.env
-    cat ~/project/.env
+    printenv > /home/ubuntu/backend/.env
+    cat /home/ubuntu/backend/.env
   register: env_result
 
 
