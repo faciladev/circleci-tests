@@ -2,7 +2,7 @@
 
 - name: Make directory
   file:
-    path: ~/project
+    path: /home/ubuntu/backend
     state: directory
   register: directory_out
 
@@ -17,15 +17,15 @@
 - name: Copy files
   unarchive:
     src: ../../artifact.tar.gz
-    dest: ~/project
+    dest: /home/ubuntu/project
 
 - name: List files in directory
   shell: |
     echo "This is the home dir: $(echo ~/)"
     echo "This is the pwd: $(pwd)"
-    echo "This is the listed directory: $(ls)"
-    cd ~/project
-    echo "This is the working dir after cd ~/project: $(pwd)"
+    cd /home/ubuntu/project
+    echo "This is the working dir after cd : $(pwd)"
+    echo "This is the listed project directory: $(ls)"
   args:
     executable: /bin/bash
   register: shell_result
@@ -36,7 +36,7 @@
 
 - name: Directory result
   debug:
-    msg: "{{ directory_out.stout_lines }}"
+    msg: "{{ directory_out.stdout_lines }}"
 
 - name: Environment result
   debug:
