@@ -21,10 +21,11 @@
 
 - name: List files in directory
   shell: |
-    pwd
-    ls
+    echo "This is the home dir: $(echo ~/)"
+    echo "This is the pwd: $(pwd)"
+    echo "This is the listed directory: $(ls)"
     cd ~/project
-    pwd
+    echo "This is the working dir after cd ~/project: $(pwd)"
   args:
     executable: /bin/bash
   register: shell_result
@@ -39,6 +40,6 @@
 
 - name: Environment result
   debug:
-    msg: "{{ env_result.stout_lines }}"
+    msg: "{{ env_result.stdout_lines }}"
 
 
