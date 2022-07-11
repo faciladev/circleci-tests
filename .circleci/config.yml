@@ -41,32 +41,31 @@ jobs:
 
       - destroy-environment-on-fail
 
-  # update-inventory-file:
-  #   docker:
-  #     - image: amazon/aws-cli
+  update-inventory-file:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install tar and gzip
+          command: |
+            yum install -y tar gzip
 
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: Install tar and gzip
-  #         command: |
-  #           yum install -y tar gzip
+      - run:
+          name: Add back-end ip to ansible inventory
+          command: |
+            aws ec2 describe-instances \
+              --filters Name=tag:Name,Values=testec2-<< pipeline.parameters.workflow_id >> \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --output text | cat >> .circleci/ansible/inventory.txt
+            cat .circleci/ansible/inventory.txt
 
-  #     - run:
-  #         name: Add back-end ip to ansible inventory
-  #         command: |
-  #           aws ec2 describe-instances \
-  #             --filters Name=tag:Name,Values=testec2-<< pipeline.parameters.workflow_id >> \
-  #             --query 'Reservations[*].Instances[*].PublicIpAddress' \
-  #             --output text | cat >> .circleci/ansible/inventory.txt
-  #           cat .circleci/ansible/inventory.txt
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/ansible/inventory.txt
 
-  #     - persist_to_workspace:
-  #         root: ~/
-  #         paths:
-  #           - project/.circleci/ansible/inventory.txt
-
-  #     - destroy-environment-on-fail
+      - destroy-environment-on-fail
 
   # get-ip-address:
   #   docker:
@@ -198,16 +197,16 @@ workflows:
     jobs:
       # - check-image
       - create-infrastructure
-      # - update-inventory-file:
-      #     requires:
-      #       - create-infrastructure
+      - update-inventory-file:
+          requires:
+            - create-infrastructure
       # - configure-infrastructure:
       #     requires:
       #       - update-inventory-file
       - archive-infra-folder:
           requires:
-            # - update-inventory-file
-            - create-infrastructure
+            - update-inventory-file
+            # - create-infrastructure
       # - job-1
       # - job-2:
       #     requires:
