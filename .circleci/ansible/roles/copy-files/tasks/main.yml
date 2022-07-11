@@ -29,7 +29,7 @@
     echo "This is the pwd: $(pwd)"
     cd /home/ubuntu/backend
     echo "This is the working dir after cd : $(pwd)"
-    echo "This is the listed project directory: $(ls)"
+    echo "This is the listed project directory: $(ls -a)"
   args:
     executable: /bin/bash
   register: shell_result
