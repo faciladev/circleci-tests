@@ -4,7 +4,6 @@
   file:
     path: /home/ubuntu/backend
     state: directory
-  register: directory_out
 
 - name: Print Env Vars
   shell: |
@@ -33,10 +32,6 @@
 - name: Show results
   debug:
     msg: "{{ shell_result.stdout_lines }}"
-
-- name: Directory result
-  debug:
-    msg: "{{ directory_out.stdout_lines }}"
 
 - name: Environment result
   debug:
