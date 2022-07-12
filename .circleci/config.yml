@@ -41,31 +41,31 @@ jobs:
 
       - destroy-environment-on-fail
 
-  update-inventory-file:
-    docker:
-      - image: amazon/aws-cli
-    steps:
-      - checkout
-      - run:
-          name: Install tar and gzip
-          command: |
-            yum install -y tar gzip
+  # update-inventory-file:
+  #   docker:
+  #     - image: amazon/aws-cli
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Install tar and gzip
+  #         command: |
+  #           yum install -y tar gzip
 
-      - run:
-          name: Add back-end ip to ansible inventory
-          command: |
-            aws ec2 describe-instances \
-              --filters Name=tag:Name,Values=testec2-<< pipeline.parameters.workflow_id >> \
-              --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --output text | cat >> .circleci/ansible/inventory.txt
-            cat .circleci/ansible/inventory.txt
+  #     - run:
+  #         name: Add back-end ip to ansible inventory
+  #         command: |
+  #           aws ec2 describe-instances \
+  #             --filters Name=tag:Name,Values=testec2-<< pipeline.parameters.workflow_id >> \
+  #             --query 'Reservations[*].Instances[*].PublicIpAddress' \
+  #             --output text | cat >> .circleci/ansible/inventory.txt
+  #           cat .circleci/ansible/inventory.txt
 
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - project/.circleci/ansible/inventory.txt
+  #     - persist_to_workspace:
+  #         root: ~/
+  #         paths:
+  #           - project/.circleci/ansible/inventory.txt
 
-      - destroy-environment-on-fail
+  #     - destroy-environment-on-fail
 
   # get-ip-address:
   #   docker:
@@ -88,32 +88,78 @@ jobs:
   #     - destroy-environment-on-fail
       # - destroy-environment-on-pass
 
-  archive-infra-folder:
+
+  format-ip-address:
     docker:
-      - image: cimg/python:3.8.13
+      - image: amazon/aws-cli
+
     steps:
       - checkout
-      - add_ssh_keys:
-          fingerprints: ["1d:83:9d:af:35:e2:5b:9c:ae:3c:89:6b:43:be:ef:4e"]
+      - run:
+          name: Get EC2 Ip address
+          command: |
+            BACKEND_IP=$(aws ec2 describe-instances \
+              --filters Name=tag:Name,Values=testec2-<< pipeline.parameters.workflow_id >> \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --output text)
+            echo "This is the backend ip address: ${BACKEND_IP}"
+            echo "API_URL=${BACKEND_IP}:3030" > .env
+            echo "This is the API_URL: $(cat ~/project/.env)"
+
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.env
+
+      - destroy-environment-on-fail
+
+  retrieve-api-url:
+    docker:
+      - image: cimg/base:2022.02
+
+    steps:
+      - checkout
       - attach_workspace:
           at: ~/
       - run:
-          name: Install AWSCLI and Ansible
+          name: Retrieve API URL
           command: |
-            pip3 install awscli
-            pip3 install ansible
-      - run:
-          name: Archive folder
-          command: |
-            printenv
-            printenv > ./infra/.env
-            echo "before zip: $(ls ./infra -a)"
-            tar -C infra -czvf artifact.tar.gz .
-            cd .circleci/ansible
-            ansible-playbook -i inventory.txt unarchive-infra.yml
+            echo "This is the retrieved API_URL: $(cat ~/project/.env)"
 
       - destroy-environment-on-fail
       - destroy-environment-on-pass
+
+      # - persist_to_workspace:
+      #     root: ~/
+      #     paths:
+      #       - project/.env
+
+  # archive-infra-folder:
+  #   docker:
+  #     - image: cimg/python:3.8.13
+  #   steps:
+  #     - checkout
+  #     - add_ssh_keys:
+  #         fingerprints: ["1d:83:9d:af:35:e2:5b:9c:ae:3c:89:6b:43:be:ef:4e"]
+  #     - attach_workspace:
+  #         at: ~/
+  #     - run:
+  #         name: Install AWSCLI and Ansible
+  #         command: |
+  #           pip3 install awscli
+  #           pip3 install ansible
+  #     - run:
+  #         name: Archive folder
+  #         command: |
+  #           printenv
+  #           printenv > ./infra/.env
+  #           echo "before zip: $(ls ./infra -a)"
+  #           tar -C infra -czvf artifact.tar.gz .
+  #           cd .circleci/ansible
+  #           ansible-playbook -i inventory.txt unarchive-infra.yml
+
+  #     - destroy-environment-on-fail
+  #     - destroy-environment-on-pass
     
 #   test-2:
 #     docker:
@@ -200,15 +246,15 @@ workflows:
     jobs:
       # - check-image
       - create-infrastructure
-      - update-inventory-file:
-          requires:
-            - create-infrastructure
+      # - update-inventory-file:
+      #     requires:
+      #       - create-infrastructure
       # - configure-infrastructure:
       #     requires:
       #       - update-inventory-file
-      - archive-infra-folder:
-          requires:
-            - update-inventory-file
+      # - archive-infra-folder:
+      #     requires:
+      #       - update-inventory-file
             # - create-infrastructure
       # - job-1
       # - job-2:
@@ -217,5 +263,11 @@ workflows:
       # - get-ip-address:
       #     requires:
       #       - create-infrastructure
+      - format-ip-address:
+          requires:
+            - create-infrastructure
+      - retrieve-api-url:
+          requires:
+            - format-ip-address
 
 
