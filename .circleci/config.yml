@@ -96,6 +96,10 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install tar and gzip
+          command: |
+            yum install -y tar gzip
+      - run:
           name: Get EC2 Ip address
           command: |
             BACKEND_IP=$(aws ec2 describe-instances \
@@ -119,6 +123,10 @@ jobs:
 
     steps:
       - checkout
+      - run:
+          name: Install tar and gzip
+          command: |
+            yum install -y tar gzip
       - attach_workspace:
           at: ~/
       - run:
