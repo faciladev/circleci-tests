@@ -5,6 +5,10 @@ parameters:
     type: string
     default: ${CIRCLE_WORKFLOW_ID:0:7}
 
+  kv-key:
+    type: string
+    default: xqzlp7yq
+
 commands:
   destroy-environment-on-fail:
     description: Destroy AWS provisioned resources on fail
@@ -25,21 +29,21 @@ commands:
             aws cloudformation delete-stack --stack-name "testec2-<< pipeline.parameters.workflow_id >>"
 
 jobs:
-  create-infrastructure:
-    docker:
-      - image: amazon/aws-cli
-    steps:
-      - checkout
-      - run:
-          name: "Setup EC2 instance"
-          command: |
-            aws cloudformation deploy \
-              --template-file infra/backend.yml \
-              --tags project=testing \
-              --stack-name "testec2-<< pipeline.parameters.workflow_id >>" \
-              --parameter-overrides ID="<< pipeline.parameters.workflow_id >>"
+  # create-infrastructure:
+  #   docker:
+  #     - image: amazon/aws-cli
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: "Setup EC2 instance"
+  #         command: |
+  #           aws cloudformation deploy \
+  #             --template-file infra/backend.yml \
+  #             --tags project=testing \
+  #             --stack-name "testec2-<< pipeline.parameters.workflow_id >>" \
+  #             --parameter-overrides ID="<< pipeline.parameters.workflow_id >>"
 
-      - destroy-environment-on-fail
+  #     - destroy-environment-on-fail
 
   # update-inventory-file:
   #   docker:
@@ -88,61 +92,143 @@ jobs:
   #     - destroy-environment-on-fail
       # - destroy-environment-on-pass
 
-
-  format-ip-address:
+  build-backend:
     docker:
-      - image: amazon/aws-cli
-
+      - image: circleci/node:13.8.0
     steps:
       - checkout
+      - restore_cache:
+          keys: [backend-build]
       - run:
-          name: Install tar and gzip
+          name: Back-end build
           command: |
-            yum install -y tar gzip
+            cd backend
+            npm install
+            npm run build
+      - save_cache:
+          key: backend-build
+          paths: [backend/node_modules]
+
+      # - destroy-environment-on-fail
+
+  configure-backend-server:
+    docker:
+      - image: cimg/python:3.8.13-node
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [backend-build]
       - run:
-          name: Get EC2 Ip address
+          name: Install dependencies
           command: |
-            BACKEND_IP=$(aws ec2 describe-instances \
-              --filters Name=tag:Name,Values=testec2-<< pipeline.parameters.workflow_id >> \
-              --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --output text)
-            echo "This is the backend ip address: ${BACKEND_IP}"
-            echo "API_URL=${BACKEND_IP}:3030" > .env
-            echo "This is the API_URL: $(cat ~/project/.env)"
+            pip3 install awscli
 
       - run:
-          name: Check if folder has .env
+          name: Inspect folder
           command: |
-            pwd
-            echo "This is still the API_URL: $(cat ~/project/.env)"
-            ls -a
+            ls -a ~/project/backend
+
+      # - run:
+      #     name: Configure server
+      #     command: |
+      #       cd .circleci/ansible
+      #       ansible-playbook -i inventory.txt configure-server.yml
+
+      # - destroy-environment-on-fail
+
+  run-migrations:
+    docker:
+      - image: cimg/python:3.8.13-node
+        
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [backend-build]
+      - run:
+          name: Install dependencies
+          command: |
+            pip3 install awscli
+
+      - run:
+          name: Run migrations
+          command: |
+            cd backend
+            npm install
+            echo "About to run migrations"
+            npm run migrations > migrations_dump.txt
+            cat ~/project/backend/migrations_dump.txt
+
+      - run:
+          name: Send migration results to keyvalue.immanuel.co
+          command: |
+            if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
+            then
+              curl -H "content-length: 0" -X POST https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/<< pipeline.parameters.kv-key >>/migration_<< pipeline.parameters.workflow_id >>/1
+            else
+              exit 1
+            fi
 
       - persist_to_workspace:
           root: ~/
           paths:
-            - project/.env
+            - project/backend/migrations_dump.txt
+     
+      # - destroy-environment-on-fail
 
-      - destroy-environment-on-fail
+  # format-ip-address:
+  #   docker:
+  #     - image: amazon/aws-cli
 
-  retrieve-api-url:
-    docker:
-      - image: amazon/aws-cli
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Install tar and gzip
+  #         command: |
+  #           yum install -y tar gzip
+  #     - run:
+  #         name: Get EC2 Ip address
+  #         command: |
+  #           BACKEND_IP=$(aws ec2 describe-instances \
+  #             --filters Name=tag:Name,Values=testec2-<< pipeline.parameters.workflow_id >> \
+  #             --query 'Reservations[*].Instances[*].PublicIpAddress' \
+  #             --output text)
+  #           echo "This is the backend ip address: ${BACKEND_IP}"
+  #           echo "API_URL=${BACKEND_IP}:3030" > .env
+  #           echo "This is the API_URL: $(cat ~/project/.env)"
 
-    steps:
-      - checkout
-      - run:
-          name: Install tar and gzip
-          command: |
-            yum install -y tar gzip
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Retrieve API URL
-          command: |
-            echo "This is the retrieved API_URL: $(cat ~/project/.env)"
+  #     - run:
+  #         name: Check if folder has .env
+  #         command: |
+  #           pwd
+  #           echo "This is still the API_URL: $(cat ~/project/.env)"
+  #           ls -a
 
-      - destroy-environment-on-fail
-      - destroy-environment-on-pass
+  #     - persist_to_workspace:
+  #         root: ~/
+  #         paths:
+  #           - project/.env
+
+  #     - destroy-environment-on-fail
+
+  # retrieve-api-url:
+  #   docker:
+  #     - image: amazon/aws-cli
+
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Install tar and gzip
+  #         command: |
+  #           yum install -y tar gzip
+  #     - attach_workspace:
+  #         at: ~/
+  #     - run:
+  #         name: Retrieve API URL
+  #         command: |
+  #           echo "This is the retrieved API_URL: $(cat ~/project/.env)"
+
+  #     - destroy-environment-on-fail
+  #     - destroy-environment-on-pass
 
       # - persist_to_workspace:
       #     root: ~/
@@ -260,7 +346,7 @@ workflows:
   test-workflow:
     jobs:
       # - check-image
-      - create-infrastructure
+      # - create-infrastructure
       # - update-inventory-file:
       #     requires:
       #       - create-infrastructure
@@ -278,11 +364,18 @@ workflows:
       # - get-ip-address:
       #     requires:
       #       - create-infrastructure
-      - format-ip-address:
+      # - format-ip-address:
+      #     requires:
+      #       - create-infrastructure
+      # - retrieve-api-url:
+      #     requires:
+      #       - format-ip-address
+      - build-backend
+      - configure-backend-server:
           requires:
-            - create-infrastructure
-      - retrieve-api-url:
+            - build-backend
+      - run-migrations:
           requires:
-            - format-ip-address
+            - configure-backend-server
 
 
