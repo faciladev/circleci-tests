@@ -165,9 +165,14 @@ jobs:
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
             then
               curl -H "content-length: 0" -X POST https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/<< pipeline.parameters.kv-key >>/migration_<< pipeline.parameters.workflow_id >>/1
+            elif grep -q "No migrations are pending" ~/project/backend/migrations_dump.txt
+            then
+              curl -H "content-length: 0" -X POST https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/<< pipeline.parameters.kv-key >>/migration_<< pipeline.parameters.workflow_id >>/1
             else
               exit 1
             fi
+
+
 
       - persist_to_workspace:
           root: ~/
