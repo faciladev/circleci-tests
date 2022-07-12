@@ -110,6 +110,13 @@ jobs:
             echo "API_URL=${BACKEND_IP}:3030" > .env
             echo "This is the API_URL: $(cat ~/project/.env)"
 
+      - run:
+          name: Check if folder has .env
+          command: |
+            pwd
+            echo "This is still the API_URL: $(cat ~/project/.env)"
+            ls -a
+
       - persist_to_workspace:
           root: ~/
           paths:
