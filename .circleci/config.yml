@@ -119,10 +119,14 @@ jobs:
 
   retrieve-api-url:
     docker:
-      - image: cimg/base:2022.02
+      - image: amazon/aws-cli
 
     steps:
       - checkout
+      - run:
+          name: Install tar and gzip
+          command: |
+            yum install -y tar gzip
       - attach_workspace:
           at: ~/
       - run:
