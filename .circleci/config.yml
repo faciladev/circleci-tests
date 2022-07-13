@@ -22,14 +22,13 @@ commands:
           command: |
             aws cloudformation delete-stack --stack-name "testec2-<< pipeline.parameters.workflow_id >>"
 
-  destroy-environment-on-pass:
-    description: Destroy AWS provisioned resources on fail
+  slack-notify-on-fail:
+    description: Notify via slack on fail
     steps:
-      - run:
-          name: Destroy environments on pass
-          when: on_success
-          command: |
-            aws cloudformation delete-stack --stack-name "testec2-<< pipeline.parameters.workflow_id >>"
+      - slack/notify:
+          channel: C03NW4N9HDF
+          event: fail
+          template: basic_fail_1
 
 jobs:
   # create-infrastructure:
@@ -57,11 +56,12 @@ jobs:
           name: "Test slack"
           command: |
             exit 1
+      - slack-notify-on-fail
 
-      - slack/notify:
-          channel: C03NW4N9HDF
-          event: fail
-          template: basic_fail_1
+      # - slack/notify:
+      #     channel: C03NW4N9HDF
+      #     event: fail
+      #     template: basic_fail_1
 
   # update-inventory-file:
   #   docker:
