@@ -398,12 +398,12 @@ workflows:
       - create-prometheus-server
       # - check-image
       # - create-infrastructure
-      - update-inventory-file:
-          requires:
-            - create-prometheus-server
-      - configure-prom-server:
-          requires:
-            - update-inventory-file
+      # - update-inventory-file:
+      #     requires:
+      #       - create-prometheus-server
+      # - configure-prom-server:
+      #     requires:
+      #       - update-inventory-file
       # - configure-infrastructure:
       #     requires:
       #       - update-inventory-file
