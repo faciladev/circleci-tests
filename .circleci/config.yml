@@ -62,8 +62,8 @@ jobs:
               --stack-name "testec2-<< pipeline.parameters.workflow_id >>" \
               --parameter-overrides ID="<< pipeline.parameters.workflow_id >>"
 
-      - destroy-environment-on-fail
-      - slack-notify-on-fail
+      # - destroy-environment-on-fail
+      # - slack-notify-on-fail
 
   update-inventory-file:
     docker:
