@@ -1,7 +1,7 @@
 ---
 
 - name: Deploy prometheus on ec2
-  hosts: default
+  hosts: web
   user: ubuntu
   become: true
   become_method: sudo

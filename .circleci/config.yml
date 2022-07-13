@@ -59,7 +59,7 @@ jobs:
             aws cloudformation deploy \
               --template-file infra/prometheus.yml \
               --tags project=testing \
-              --stack-name "prom-ec2-<< pipeline.parameters.workflow_id >>" \
+              --stack-name "testec2-<< pipeline.parameters.workflow_id >>" \
               --parameter-overrides ID="<< pipeline.parameters.workflow_id >>"
 
       - destroy-environment-on-fail
@@ -96,6 +96,8 @@ jobs:
       - image: cimg/python:3.9.11
     steps:
       - checkout
+      - attach_workspace:
+          at: ~/
       - run:
           name: Install ansible
           command: |
@@ -106,7 +108,7 @@ jobs:
           name: Run playbook
           command: |
             cd .circleci/ansible
-            ansible-playbook -i prometheus_host.txt deploy-prometheus.yml
+            ansible-playbook -i inventory.txt deploy-prometheus.yml
 
       - destroy-environment-on-fail
 
@@ -396,9 +398,12 @@ workflows:
       - create-prometheus-server
       # - check-image
       # - create-infrastructure
-      # - update-inventory-file:
-      #     requires:
-      #       - create-infrastructure
+      - update-inventory-file:
+          requires:
+            - create-infrastructure
+      - configure-prom-server:
+          requires:
+            - update-inventory-file
       # - configure-infrastructure:
       #     requires:
       #       - update-inventory-file
