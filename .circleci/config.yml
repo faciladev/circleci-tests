@@ -65,52 +65,52 @@ jobs:
       # - destroy-environment-on-fail
       # - slack-notify-on-fail
 
-  update-inventory-file:
-    docker:
-      - image: amazon/aws-cli
-    steps:
-      - checkout
-      - run:
-          name: Install tar and gzip
-          command: |
-            yum install -y tar gzip
+  # update-inventory-file:
+  #   docker:
+  #     - image: amazon/aws-cli
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Install tar and gzip
+  #         command: |
+  #           yum install -y tar gzip
 
-      - run:
-          name: Add back-end ip to ansible inventory
-          command: |
-            aws ec2 describe-instances \
-              --filters Name=tag:Name,Values=testec2-<< pipeline.parameters.workflow_id >> \
-              --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --output text | cat >> .circleci/ansible/inventory.txt
-            cat .circleci/ansible/inventory.txt
+  #     - run:
+  #         name: Add back-end ip to ansible inventory
+  #         command: |
+  #           aws ec2 describe-instances \
+  #             --filters Name=tag:Name,Values=testec2-<< pipeline.parameters.workflow_id >> \
+  #             --query 'Reservations[*].Instances[*].PublicIpAddress' \
+  #             --output text | cat >> .circleci/ansible/inventory.txt
+  #           cat .circleci/ansible/inventory.txt
 
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - project/.circleci/ansible/inventory.txt
+  #     - persist_to_workspace:
+  #         root: ~/
+  #         paths:
+  #           - project/.circleci/ansible/inventory.txt
 
-      - destroy-environment-on-fail
+  #     - destroy-environment-on-fail
 
-  configure-prom-server:
-    docker:
-      - image: cimg/python:3.9.11
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Install ansible
-          command: |
-            pip3 install awscli
-            pip3 install ansible
+  # configure-prom-server:
+  #   docker:
+  #     - image: cimg/python:3.9.11
+  #   steps:
+  #     - checkout
+  #     - attach_workspace:
+  #         at: ~/
+  #     - run:
+  #         name: Install ansible
+  #         command: |
+  #           pip3 install awscli
+  #           pip3 install ansible
 
-      - run:
-          name: Run playbook
-          command: |
-            cd .circleci/ansible
-            ansible-playbook -i inventory.txt deploy-prometheus.yml
+  #     - run:
+  #         name: Run playbook
+  #         command: |
+  #           cd .circleci/ansible
+  #           ansible-playbook -i inventory.txt deploy-prometheus.yml
 
-      - destroy-environment-on-fail
+  #     - destroy-environment-on-fail
 
 
 
