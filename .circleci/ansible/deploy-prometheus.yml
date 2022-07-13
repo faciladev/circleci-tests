@@ -1,0 +1,10 @@
+---
+
+- name: Deploy prometheus on ec2
+  hosts: default
+  user: ubuntu
+  become: true
+  become_method: sudo
+  become_user: root
+  roles:
+    - configure-prometheus-node-exporter

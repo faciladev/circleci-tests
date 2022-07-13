@@ -46,48 +46,74 @@ jobs:
   #             --parameter-overrides ID="<< pipeline.parameters.workflow_id >>"
 
   #     - destroy-environment-on-fail
+  #     - slack-notify-on-fail
 
-  test-slack:
+  create-prometheus-server:
     docker:
-      - image: cimg/base:2022.06-22.04
+      - image: amazon/aws-cli
     steps:
       - checkout
       - run:
-          name: "Test slack"
+          name: "Setup EC2 instance"
           command: |
-            exit 1
+            aws cloudformation deploy \
+              --template-file infra/prometheus.yml \
+              --tags project=testing \
+              --stack-name "prom-ec2-<< pipeline.parameters.workflow_id >>" \
+              --parameter-overrides ID="<< pipeline.parameters.workflow_id >>"
+
+      - destroy-environment-on-fail
       - slack-notify-on-fail
 
-      # - slack/notify:
-      #     channel: C03NW4N9HDF
-      #     event: fail
-      #     template: basic_fail_1
+  update-inventory-file:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install tar and gzip
+          command: |
+            yum install -y tar gzip
 
-  # update-inventory-file:
-  #   docker:
-  #     - image: amazon/aws-cli
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: Install tar and gzip
-  #         command: |
-  #           yum install -y tar gzip
+      - run:
+          name: Add back-end ip to ansible inventory
+          command: |
+            aws ec2 describe-instances \
+              --filters Name=tag:Name,Values=testec2-<< pipeline.parameters.workflow_id >> \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --output text | cat >> .circleci/ansible/inventory.txt
+            cat .circleci/ansible/inventory.txt
 
-  #     - run:
-  #         name: Add back-end ip to ansible inventory
-  #         command: |
-  #           aws ec2 describe-instances \
-  #             --filters Name=tag:Name,Values=testec2-<< pipeline.parameters.workflow_id >> \
-  #             --query 'Reservations[*].Instances[*].PublicIpAddress' \
-  #             --output text | cat >> .circleci/ansible/inventory.txt
-  #           cat .circleci/ansible/inventory.txt
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/ansible/inventory.txt
 
-  #     - persist_to_workspace:
-  #         root: ~/
-  #         paths:
-  #           - project/.circleci/ansible/inventory.txt
+      - destroy-environment-on-fail
 
-  #     - destroy-environment-on-fail
+  configure-prom-server:
+    docker:
+      - image: cimg/python:3.9.11
+    steps:
+      - checkout
+      - run:
+          name: Install ansible
+          command: |
+            pip3 install awscli
+            pip3 install ansible
+
+      - run:
+          name: Run playbook
+          command: |
+            cd .circleci/ansible
+            ansible-playbook -i prometheus_host.txt deploy-prometheus.yml
+
+      - destroy-environment-on-fail
+
+
+
+
+  
 
   # get-ip-address:
   #   docker:
@@ -367,6 +393,7 @@ jobs:
 workflows:
   test-workflow:
     jobs:
+      - create-prometheus-server
       # - check-image
       # - create-infrastructure
       # - update-inventory-file:
@@ -392,7 +419,7 @@ workflows:
       # - retrieve-api-url:
       #     requires:
       #       - format-ip-address
-      - test-slack
+      # - test-slack
       # - build-backend
       # - configure-backend-server:
       #     requires:
