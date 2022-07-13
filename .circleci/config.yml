@@ -400,7 +400,7 @@ workflows:
       # - create-infrastructure
       - update-inventory-file:
           requires:
-            - create-infrastructure
+            - create-prometheus-server
       - configure-prom-server:
           requires:
             - update-inventory-file
