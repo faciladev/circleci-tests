@@ -16,7 +16,7 @@
       lineinfile:
         path: /etc/sudoers
         state: present
-        line: 'postgres ALL=(ALL) NOPASSWD: ALL'
+        line: 'circleci ALL=(ALL) NOPASSWD: ALL'
         validate: 'visudo -cf %s'
 
   roles:
