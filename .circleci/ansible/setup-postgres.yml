@@ -11,5 +11,5 @@
     postgres_db_name: my_db
     allow_world_readable_tmpfiles: true
 
-  tasks:
+  roles:
     - setup-postgres
