@@ -7,7 +7,7 @@
 
 - name: Show environment vars
   debug:
-    msg: {{ env_vars.stdout_lines }}
+    msg: "{{ env_vars.stdout_lines }}"
 
 # Ensure that the server is up to date
 - name: Update apt repo and cache on Ubuntu box
