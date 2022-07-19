@@ -11,13 +11,13 @@
     postgres_db_name: my_db
     allow_world_readable_tmpfiles: true
 
-  # pre_tasks:
-  #   - name: Allow user sudo without a password
-  #     lineinfile:
-  #       path: /etc/sudoers
-  #       state: present
-  #       line: 'sudo ALL=(ALL) NOPASSWD: ALL'
-  #       validate: 'visudo -cf %s'
+  pre_tasks:
+    - name: Allow user sudo without a password
+      lineinfile:
+        path: /etc/sudoers
+        state: present
+        line: 'sudo ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
 
   roles:
     - setup-postgres
