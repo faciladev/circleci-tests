@@ -120,7 +120,7 @@ jobs:
       - checkout
       - run:
           name: install ansible
-          command: sudo pip3 install ansible
+          command: pip3 install ansible
       - run:
           name: Install postgres
           command: |
