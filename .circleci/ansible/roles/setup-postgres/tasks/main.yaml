@@ -86,25 +86,3 @@
     login_password: '{{ postgres_root_pass }}'
     name: '{{ postgres_db_name }}'
     state: present
-
-# Set up handlers
-- name: Restart Postgresql
-  systemd:
-    name: postgresql
-    state: restarted
-
-- name: Start Postgresql
-  systemd:
-    name: postgresql
-    state: started
-
-- name: Stop Postgresql
-  systemd:
-    name: postgresql
-    state: stopped
-
-- name: Enable Postgresql
-  systemd:
-    name: postgresql
-    enabled: yes
-

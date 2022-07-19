@@ -13,3 +13,26 @@
 
   roles:
     - setup-postgres
+
+  handlers:
+      # Set up handlers
+      # include_tasks: postgres_handlers.yml
+      - name: Restart Postgresql
+        systemd:
+          name: postgresql
+          state: restarted
+
+      - name: Start Postgresql
+        systemd:
+          name: postgresql
+          state: started
+
+      - name: Stop Postgresql
+        systemd:
+          name: postgresql
+          state: stopped
+
+      - name: Enable Postgresql
+        systemd:
+          name: postgresql
+          enabled: yes
