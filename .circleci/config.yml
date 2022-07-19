@@ -48,19 +48,19 @@ jobs:
   #     - destroy-environment-on-fail
   #     - slack-notify-on-fail
 
-  create-prometheus-server:
-    docker:
-      - image: amazon/aws-cli
-    steps:
-      - checkout
-      - run:
-          name: "Setup EC2 instance"
-          command: |
-            aws cloudformation deploy \
-              --template-file infra/prometheus.yml \
-              --tags project=testing \
-              --stack-name "testec2-<< pipeline.parameters.workflow_id >>" \
-              --parameter-overrides ID="<< pipeline.parameters.workflow_id >>"
+  # create-prometheus-server:
+  #   docker:
+  #     - image: amazon/aws-cli
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: "Setup EC2 instance"
+  #         command: |
+  #           aws cloudformation deploy \
+  #             --template-file infra/prometheus.yml \
+  #             --tags project=testing \
+  #             --stack-name "testec2-<< pipeline.parameters.workflow_id >>" \
+  #             --parameter-overrides ID="<< pipeline.parameters.workflow_id >>"
 
       # - destroy-environment-on-fail
       # - slack-notify-on-fail
@@ -113,6 +113,19 @@ jobs:
   #     - destroy-environment-on-fail
 
 
+  postgres-test:
+    docker:
+      - image: cimg/python:3.9.11
+    steps:
+      - checkout
+      - run:
+          name: install ansible
+          command: sudo pip install ansible
+      - run:
+          name: Install postgres
+          command: |
+            cd ansible
+            ansible-playbook setup-postgres.yml -vv
 
 
   
@@ -395,7 +408,8 @@ jobs:
 workflows:
   test-workflow:
     jobs:
-      - create-prometheus-server
+      - postgres-test
+      # - create-prometheus-server
       # - check-image
       # - create-infrastructure
       # - update-inventory-file:

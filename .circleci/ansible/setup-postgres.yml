@@ -1,0 +1,14 @@
+---
+
+- name: Set up postgres
+  hosts: localhost
+  user: ubuntu
+  become: true
+  gather_facts: false
+  vars:
+    postgres_root_user: ubuntu
+    postgres_root_pass: mypassword
+    allow_world_readable_tmpfiles: true
+
+  tasks:
+    - setup-postgres
