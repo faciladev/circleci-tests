@@ -80,6 +80,13 @@
     encrypted: yes
     state: present
 
+- name: Create a database
+  postgresql_db:
+    login_user: '{{ postgres_root_user }}'
+    login_password: '{{ postgres_root_pass }}'
+    name: '{{ postgres_db_name }}'
+    state: present
+
 # Set up handlers
 - name: Restart Postgresql
   systemd:
