@@ -74,7 +74,7 @@
   become: yes
   become_user: postgres
   vars:
-    ansible_ssh_pipelining: yes
+    ansible_ssh_pipelining: true
   postgresql_user:
     name: '{{ postgres_root_user }}'
     password: '{{ postgres_root_pass }}'
