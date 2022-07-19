@@ -73,6 +73,8 @@
 - name: Create a Superuser PostgreSQL database user
   become: yes
   become_user: postgres
+  vars:
+    ansible_ssh_pipelining: yes
   postgresql_user:
     name: '{{ postgres_root_user }}'
     password: '{{ postgres_root_pass }}'
