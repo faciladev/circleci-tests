@@ -2,7 +2,7 @@
 
 - name: Set up postgres
   hosts: localhost
-  user: ubuntu
+  remote_user: ubuntu
   become: true
   gather_facts: false
   vars:
@@ -16,7 +16,7 @@
       lineinfile:
         path: /etc/sudoers
         state: present
-        line: 'postgres ALL=(ALL) NOPASSWD: ALL'
+        line: 'ubuntu ALL=(ALL) NOPASSWD: ALL'
         validate: 'visudo -cf %s'
 
   roles:
