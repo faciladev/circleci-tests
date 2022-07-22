@@ -60,6 +60,11 @@
     state: present
   notify: Restart Postgresql
 
+- name: Start Postgresql
+  systemd:
+    name: postgresql
+    state: started
+
 - name: Add new configuration to "pg_hba.conf"
   blockinfile:
     dest: /etc/postgresql/14/main/pg_hba.conf
