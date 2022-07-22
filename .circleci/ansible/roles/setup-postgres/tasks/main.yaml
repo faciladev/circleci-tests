@@ -43,8 +43,13 @@
   apt:
     name: postgresql-14
     update_cache: yes
-  notify:
-    - Enable Postgresql
+  # notify:
+  #   - Enable Postgresql
+
+- name: Enable Postgresql
+  systemd:
+    name: postgresql
+    enabled: yes
 
 # Configure Postgres 14
 - name: Ensure PostgreSQL is listening on *
