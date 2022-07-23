@@ -5,4 +5,4 @@
 10.0.129.230
 
 [private_server:vars]
-ansible_ssh_common_args="-F ~/project/.circleci/ansible/ssh_proxy_config"
+ansible_ssh_common_args="-F ssh_proxy_config"
