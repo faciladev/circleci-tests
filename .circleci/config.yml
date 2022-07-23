@@ -125,7 +125,7 @@ jobs:
           name: Install postgres
           command: |
             cd .circleci/ansible
-            ansible-playbook -i proxy_inventory.txt setup-postgres.yml -vv 
+            ansible-playbook -i proxy_inventory.txt setup-postgres.yml -vvv
 
 
   

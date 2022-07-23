@@ -6,3 +6,4 @@
 
 [private_server:vars]
 ansible_ssh_common_args='-o ProxyCommand="ssh -p 22 -W %h:%p -q ubuntu@34.205.146.218"'
+ansible_host_key_checking=false
