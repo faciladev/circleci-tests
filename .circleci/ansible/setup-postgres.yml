@@ -1,7 +1,7 @@
 ---
 
 - name: Set up postgres
-  hosts: localhost
+  hosts: private_server
   remote_user: ubuntu
   become: true
   gather_facts: false
@@ -14,13 +14,13 @@
     - ansible_host_key_checking: false
     - ansible_stdout_callback: yaml
 
-  pre_tasks:
-    - name: Allow user sudo without a password
-      lineinfile:
-        path: /etc/sudoers
-        state: present
-        line: 'circleci ALL=(ALL) NOPASSWD: ALL'
-        validate: 'visudo -cf %s'
+  # pre_tasks:
+  #   - name: Allow user sudo without a password
+  #     lineinfile:
+  #       path: /etc/sudoers
+  #       state: present
+  #       line: 'circleci ALL=(ALL) NOPASSWD: ALL'
+  #       validate: 'visudo -cf %s'
 
   roles:
     - setup-postgres

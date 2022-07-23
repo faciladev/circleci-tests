@@ -1,0 +1,8 @@
+[bastion]
+34.205.146.218
+
+[private_server]
+10.0.129.230
+
+[private_server:vars]
+ansible_ssh_common_args="-F .circleci/ansible/ssh_proxy_config"

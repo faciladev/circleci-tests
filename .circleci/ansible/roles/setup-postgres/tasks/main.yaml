@@ -43,13 +43,8 @@
   apt:
     name: postgresql-14
     update_cache: yes
-  # notify:
-  #   - Enable Postgresql
-
-- name: Enable Postgresql
-  systemd:
-    name: postgresql
-    enabled: yes
+  notify:
+    - Enable Postgresql
 
 # Configure Postgres 14
 - name: Ensure PostgreSQL is listening on *
@@ -59,11 +54,6 @@
     line: "listen_addresses='*'"
     state: present
   notify: Restart Postgresql
-
-- name: Start Postgresql
-  systemd:
-    name: postgresql
-    state: started
 
 - name: Add new configuration to "pg_hba.conf"
   blockinfile:

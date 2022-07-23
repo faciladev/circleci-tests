@@ -1,0 +1,10 @@
+host bastion
+  HostName 34.205.146.218
+  User ubuntu
+  Port 22
+
+host wallet_server
+  HostName 10.0.129.230
+  User ubuntu
+  ProxyCommand ssh -F .circleci/ansible/ssh_proxy_config -W %h:%p bastion
+  Port 22
