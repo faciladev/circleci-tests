@@ -84,7 +84,7 @@
 
 - name: Create a database
   become: true
-  become_user: ubuntu
+  become_user: postgres
   postgresql_db:
     # login_user: '{{ postgres_root_user }}'
     # login_password: '{{ postgres_root_pass }}'
