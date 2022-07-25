@@ -1,5 +1,5 @@
 [bastion]
-34.205.146.218
+34.205.146.218 ansible_user=ubuntu
 
 [private_server]
 10.0.129.230
