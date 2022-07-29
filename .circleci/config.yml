@@ -127,6 +127,8 @@ jobs:
             cd .circleci/ansible
             ansible-playbook -i proxy_inventory.txt setup-postgres.yml -vv
 
+  
+
 
   
 
