@@ -136,48 +136,48 @@ jobs:
       image: ubuntu-2204:2022.07.1
     steps:
       - checkout
-      # - run:
-      #     name: Install Python
-      #     command: |
-      #       sudo apt update
-      #       # sudo apt upgrade -y
-      #       sudo apt install python3 -y
+      - run:
+          name: Install Python
+          command: |
+            sudo apt update
+            # sudo apt upgrade -y
+            sudo apt install python3 -y
 
-      # - run:
-      #     name: Install Ansible
-      #     command: |
-      #       pip3 install ansible
+      - run:
+          name: Install Ansible
+          command: |
+            pip3 install ansible
 
       - run:
           name: Install git
           command: |
             sudo apt install git
 
-      # - run:
-      #     name: Setup Postgres
-      #     command: |
-      #       cd .circleci/ansible
-      #       ansible-playbook setup-postgres.yml
+      - run:
+          name: Setup Postgres
+          command: |
+            cd .circleci/ansible
+            ansible-playbook setup-postgres.yml
 
       - run:
           name: Pull Git files
           command: |
             git clone https://github.com/richoak/payments_app.git
 
-      # - run:
-      #     name: Setup Server
-      #     command: |
-      #       python3 -m venv venv
-      #       cd payments_app
-      #       source ../venv/bin/activate
-      #       pip3 install -r requirements.txt
-      #       python3 manage.py migrate
-      #       gunicorn payments_app.wsgi
+      - run:
+          name: Setup Server
+          command: |
+            python3 -m venv venv
+            cd payments_app
+            source ../venv/bin/activate
+            pip3 install -r requirements.txt
+            python3 manage.py migrate
+            gunicorn payments_app.wsgi
 
-      # - run:
-      #     name: Smoke tests
-      #     command: |
-      #       curl -X http://localhost:8000/
+      - run:
+          name: Smoke tests
+          command: |
+            curl -X http://localhost:8000/
 
       # - run:
       #     name: Test connection
