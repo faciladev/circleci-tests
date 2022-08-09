@@ -1,17 +1,10 @@
 ---
 
 - name: Set up postgres
-  hosts: localhost
-  connection: local
+  hosts: web
   remote_user: ubuntu
   become: true
   gather_facts: false
-  vars:
-    - postgres_root_user: ubuntu
-    - postgres_root_pass: mypassword
-    - postgres_db_name: my_db
-    - ansible_python_interpreter: /usr/bin/python3
-    - ansible_stdout_callback: yaml
 
   pre_tasks:
     - name: "install python for Ansible."
@@ -24,6 +17,17 @@
   #       state: present
   #       line: 'circleci ALL=(ALL) NOPASSWD: ALL'
   #       validate: 'visudo -cf %s'
+
+  environment:
+    - PGPASSWORD: "{{ lookup('env', 'PGPASSWORD') }}"
+
+  vars:
+    - postgres_root_user: ubuntu
+    - postgres_root_pass: "{{ lookup('env', 'PGPASSWORD') }}"
+    - postgres_db_name: my_db
+    - ansible_python_interpreter: /usr/bin/python3
+    - ansible_stdout_callback: yaml
+
 
   roles:
     - setup-postgres
