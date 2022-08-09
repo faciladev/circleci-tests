@@ -133,6 +133,7 @@ jobs:
   setup-postres-docker:
     machine:
       image: ubuntu-2204:2022.07.1
+    working_directory: /home/circleci/app
     steps:
       - checkout
       # - restore_cache:
@@ -147,10 +148,8 @@ jobs:
           command: |
             pwd
             sudo systemctl start postgresql.service
-            sudo -u postgres psql
-            create database ${POSTGRES_DB};
-            create user ${POSTGRES_USER} with encrypted password '${POSTGRES_PASSWORD}';
-            grant all privileges on database ${POSTGRES_DB} to ${POSTGRES_USER};
+            psql -c "CREATE DATABASE ${POSTGRES_DB}" "user=${POSTGRES_USER} dbname=postgres password=${POSTGRES_PASSWORD}"
+            
       - run:
           name: Test connection
           command: |
