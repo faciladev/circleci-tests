@@ -142,10 +142,10 @@ jobs:
           command: |
             sudo apt update
             sudo apt install postgresql postgresql-contrib
-            sudo -u postgres pg_ctlcluster 12 main start
       - run:
           name: Create PG db, user and password
           command: |
+            sudo systemctl start postgresql.service
             sudo -u psql postgres
             create database ${POSTGRES_DB};
             create user ${POSTGRES_USER} with encrypted password '${POSTGRES_PASSWORD}';
