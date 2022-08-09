@@ -151,7 +151,6 @@ jobs:
             create database ${POSTGRES_DB};
             create user ${POSTGRES_USER} with encrypted password '${POSTGRES_PASSWORD}';
             grant all privileges on database ${POSTGRES_DB} to ${POSTGRES_USER};
-            \q
       - run:
           name: Test connection
           command: |
