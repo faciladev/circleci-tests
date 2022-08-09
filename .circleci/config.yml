@@ -145,7 +145,7 @@ jobs:
       - run:
           name: Create PG db, user and password
           command: |
-            sudo systemctl start postgresql.service
+            pg_ctlcluster 12 main start
             sudo -u psql postgres
             create database ${POSTGRES_DB};
             create user ${POSTGRES_USER} with encrypted password '${POSTGRES_PASSWORD}';
