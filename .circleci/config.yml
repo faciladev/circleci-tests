@@ -147,12 +147,12 @@ jobs:
           command: |
             echo ${USER}
             systemctl start postgresql.service
-            psql -c "CREATE DATABASE ${POSTGRES_DB}" "user=$USER dbname=postgres password=${POSTGRES_PASSWORD}"
+            psql -c "CREATE DATABASE ${POSTGRES_DB}" "user=ubuntu dbname=postgres password=${POSTGRES_PASSWORD}"
 
       - run:
           name: Test connection
           command: |
-            sudo psql -d ${POSTGRES_DB} -U $USER
+            sudo psql -d ${POSTGRES_DB} -U ubuntu
             \dt
             \q
 
