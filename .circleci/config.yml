@@ -131,8 +131,8 @@ jobs:
 ### CONFIGURING POSTGRES ON DOCKER
 
   setup-postres-docker:
-    docker:
-      - image: cimg/python:3.9.11
+    machine:
+      image: ubuntu-2204:2022.07.1
     steps:
       - checkout
       # - restore_cache:
