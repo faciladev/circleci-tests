@@ -137,24 +137,24 @@ jobs:
       - checkout
       # - restore_cache:
       #     keys: [venv]
-      - run:
-          name: Install Postgres
-          command: |
-            sudo apt update
-            sudo apt install postgresql postgresql-contrib
-      - run:
-          name: Create PG db, user and password
-          command: |
-            echo ${USER}
-            systemctl start postgresql.service
-            psql -c "CREATE DATABASE ${POSTGRES_DB}" "user=ubuntu dbname=postgres password=${POSTGRES_PASSWORD}"
 
       - run:
-          name: Test connection
+          name: Install Ansible
           command: |
-            sudo psql -d ${POSTGRES_DB} -U ubuntu
-            \dt
-            \q
+            sudo apt update
+            sudo apt install ansible
+      - run:
+          name: Configure machine for postgres
+          command: |
+            cd .circleci/ansible
+            ansible-playbook setup-postgres.yml 
+
+      # - run:
+      #     name: Test connection
+      #     command: |
+      #       sudo psql -d ${POSTGRES_DB} -U ubuntu
+      #       \dt
+      #       \q
 
 
   
