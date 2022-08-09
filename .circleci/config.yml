@@ -145,6 +145,7 @@ jobs:
       - run:
           name: Create PG db, user and password
           command: |
+            pwd
             sudo systemctl start postgresql.service
             sudo -u postgres psql
             create database ${POSTGRES_DB};
