@@ -140,7 +140,9 @@ jobs:
           name: Install Python
           command: |
             sudo apt update
+            sudo apt upgrade -y
             sudo apt install python3.9 -y
+
       - run:
           name: Install Ansible
           command: |
