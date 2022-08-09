@@ -113,21 +113,50 @@ jobs:
   #     - destroy-environment-on-fail
 
 
-  postgres-test:
+### CONFIGURING POSTGRES WITH ANSIBLE
+  # postgres-test:
+  #   docker:
+  #     - image: cimg/python:3.9.11
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: install ansible
+  #         command: pip3 install ansible
+  #     - run:
+  #         name: Install postgres
+  #         command: |
+  #           cd .circleci/ansible
+  #           ansible-playbook -i proxy_inventory.txt setup-postgres.yml -vv
+
+### CONFIGURING POSTGRES ON DOCKER
+
+  setup-postres-docker:
     docker:
       - image: cimg/python:3.9.11
     steps:
       - checkout
+      # - restore_cache:
+      #     keys: [venv]
       - run:
-          name: install ansible
-          command: pip3 install ansible
-      - run:
-          name: Install postgres
+          name: Install Postgres
           command: |
-            cd .circleci/ansible
-            ansible-playbook -i proxy_inventory.txt setup-postgres.yml -vv
-
-  
+            sudo apt update
+            sudo apt install postgresql postgresql-contrib
+      - run:
+          name: Create PG db, user and password
+          command: |
+            sudo systemctl start postgresql.service
+            sudo -u psql postgres
+            create database ${POSTGRES_DB};
+            create user ${POSTGRES_USER} with encrypted password '${POSTGRES_PASSWORD}';
+            grant all privileges on database ${POSTGRES_DB} to ${POSTGRES_USER};
+            \q
+      - run:
+          name: Test connection
+          command: |
+            sudo psql -d ${POSTGRES_DB} -U ${POSTGRES_USER}
+            \dt
+            \q
 
 
   
@@ -410,7 +439,8 @@ jobs:
 workflows:
   test-workflow:
     jobs:
-      - postgres-test
+      - setup-postres-docker
+      # - postgres-test
       # - create-prometheus-server
       # - check-image
       # - create-infrastructure
