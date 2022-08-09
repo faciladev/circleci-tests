@@ -145,14 +145,13 @@ jobs:
       - run:
           name: Create PG db, user and password
           command: |
-            echo $USER
-            sudo systemctl start postgresql.service
-            psql -c "CREATE DATABASE ${POSTGRES_DB}" "user=${POSTGRES_USER} dbname=postgres password=${POSTGRES_PASSWORD}"
+            systemctl start postgresql.service
+            psql -c "CREATE DATABASE ${POSTGRES_DB}" "user=$USER dbname=postgres password=${POSTGRES_PASSWORD}"
 
       - run:
           name: Test connection
           command: |
-            sudo psql -d ${POSTGRES_DB} -U ${POSTGRES_USER}
+            sudo psql -d ${POSTGRES_DB} -U $USER
             \dt
             \q
 
