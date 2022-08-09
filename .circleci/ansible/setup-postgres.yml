@@ -1,7 +1,8 @@
 ---
 
 - name: Set up postgres
-  hosts: web
+  hosts: localhost
+  connection: local
   remote_user: ubuntu
   become: true
   gather_facts: false
@@ -11,15 +12,11 @@
       become: true
       raw: test -e /usr/bin/python3 || (apt -y update && apt install -y python3)
       changed_when: false
-  #   - name: Allow user sudo without a password
-  #     lineinfile:
-  #       path: /etc/sudoers
-  #       state: present
-  #       line: 'circleci ALL=(ALL) NOPASSWD: ALL'
-  #       validate: 'visudo -cf %s'
 
   environment:
-    - PGPASSWORD: "{{ lookup('env', 'PGPASSWORD') }}"
+    - POSTGRES_DB: my_db
+    - POSTGRES_USER: ubuntu
+    - POSTGRES_PASSWORD: "{{ lookup('env', 'PGPASSWORD') }}"
 
   vars:
     - postgres_root_user: ubuntu
@@ -35,7 +32,6 @@
 
   handlers:
       # Set up handlers
-      # include_tasks: postgres_handlers.yml
       - name: Restart Postgresql
         systemd:
           name: postgresql

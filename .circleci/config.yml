@@ -114,41 +114,73 @@ jobs:
 
 
 ### CONFIGURING POSTGRES WITH ANSIBLE
-  postgres-test:
-    docker:
-      - image: cimg/python:3.9.11
-    steps:
-      - checkout
-      - run:
-          name: install ansible
-          command: pip3 install ansible
-      - run:
-          name: Install postgres
-          command: |
-            cd .circleci/ansible
-            # ansible-playbook -i proxy_inventory.txt setup-postgres.yml -vv
-            ansible-playbook -i static_inventory.txt setup-postgres.yml -vv
+  # postgres-test:
+  #   docker:
+  #     - image: cimg/python:3.9.11
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: install ansible
+  #         command: pip3 install ansible
+  #     - run:
+  #         name: Install postgres
+  #         command: |
+  #           cd .circleci/ansible
+  #           # ansible-playbook -i proxy_inventory.txt setup-postgres.yml -vv
+  #           ansible-playbook -i static_inventory.txt setup-postgres.yml -vv
 
 ### CONFIGURING POSTGRES ON DOCKER
 
-  # setup-postres-docker:
-  #   machine:
-  #     image: ubuntu-2204:2022.07.1
-  #   steps:
-  #     - checkout
-  #     # - restore_cache:
-  #     #     keys: [venv]
+  test-user-data:
+    machine:
+      image: ubuntu-2204:2022.07.1
+    steps:
+      - checkout
+      - run:
+          name: Install Python
+          command: |
+            sudo apt update
+            sudo apt upgrade -y
+            sudo apt install software-properties-common -y
+            sudo apt install python3.9 -y
+            sudo add-apt-repository ppa:deadsnakes/ppa -y
 
-  #     - run:
-  #         name: Install Ansible
-  #         command: |
-  #           sudo apt update
-  #           sudo apt install ansible
-  #     - run:
-  #         name: Configure machine for postgres
-  #         command: |
-  #           cd .circleci/ansible
-  #           ansible-playbook setup-postgres.yml 
+      - run:
+          name: Install Ansible
+          command: |
+            pip install ansible
+
+      - run:
+          name: Install git
+          command: |
+            sudo apt install git
+
+      - run:
+          name: Setup Postgres
+          command: |
+            cd .circleci/ansible
+            ansible-playbook setup-postgres.yml
+
+      - run:
+          name: Pull Git files
+          command: |
+            git remote add origin richoak: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@github.com/richoak/payments_app.git
+            git clone origin staging
+
+      - run:
+          name: Setup Server
+          command: |
+            python3 -m venv venv
+            cd payments_app
+            source ../venv/bin/activate
+            pip3 install -r requirements.txt
+            python3 manage.py migrate
+            gunicorn payments_app.wsgi
+
+      - run:
+          name: Smoke tests
+          command: |
+            curl -X http://localhost:8000/
 
       # - run:
       #     name: Test connection
@@ -439,7 +471,7 @@ workflows:
   test-workflow:
     jobs:
       # - setup-postres-docker
-      - postgres-test
+      - test-user-data
       # - create-prometheus-server
       # - check-image
       # - create-infrastructure
