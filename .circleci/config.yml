@@ -145,6 +145,7 @@ jobs:
       - run:
           name: Create PG db, user and password
           command: |
+            echo ${USER}
             systemctl start postgresql.service
             psql -c "CREATE DATABASE ${POSTGRES_DB}" "user=$USER dbname=postgres password=${POSTGRES_PASSWORD}"
 
