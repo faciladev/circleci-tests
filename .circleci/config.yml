@@ -162,7 +162,7 @@ jobs:
       - run:
           name: Pull Git files
           command: |
-            git clone https://github.com/richoak/payments_app.git/staging
+            git clone -b staging https://github.com/richoak/payments_app.git
 
       - run:
           name: Setup Server
