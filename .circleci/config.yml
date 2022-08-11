@@ -171,7 +171,7 @@ jobs:
             python3 -m venv venv
             cd payments_app
             source ../venv/bin/activate
-            pip3 install -r requirements.txt
+            pip install -r requirements.txt
             python3 manage.py migrate
             gunicorn payments_app.wsgi
 
