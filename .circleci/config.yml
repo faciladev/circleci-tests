@@ -142,8 +142,6 @@ jobs:
             sudo apt update
             # sudo apt upgrade -y
             sudo apt install python3 -y
-            python3 -m pip install --upgrade pip
-
       - run:
           name: Install Ansible
           command: |
@@ -171,6 +169,7 @@ jobs:
             python3 -m venv venv
             cd payments_app
             source ../venv/bin/activate
+            python3 -m pip install --upgrade pip
             pip install -r requirements.txt
             python3 manage.py migrate
             gunicorn payments_app.wsgi
