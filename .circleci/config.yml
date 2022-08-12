@@ -141,21 +141,22 @@ jobs:
           command: |
             sudo apt update
             sudo apt install python3 -y
-      # - run:
-      #     name: Install Ansible
-      #     command: |
-      #       pip3 install ansible
+
+      - run:
+          name: Install Ansible
+          command: |
+            pip3 install ansible
 
       - run:
           name: Install git
           command: |
             sudo apt install git
 
-      # - run:
-      #     name: Setup Postgres
-      #     command: |
-      #       cd .circleci/ansible
-      #       ansible-playbook setup-postgres.yml
+      - run:
+          name: Setup Postgres
+          command: |
+            cd .circleci/ansible
+            ansible-playbook setup-postgres.yml
 
       - run:
           name: Pull Git files
