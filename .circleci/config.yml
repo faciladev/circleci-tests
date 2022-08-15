@@ -141,7 +141,7 @@ jobs:
           command: |
             sudo apt update
             sudo apt install python3 -y
-            sudo apt-get -y install libpq-dev gcc
+            sudo apt-get -y install libpq-dev
 
       - run:
           name: Install Ansible
