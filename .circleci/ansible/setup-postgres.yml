@@ -14,21 +14,20 @@
       changed_when: false
 
   environment:
-    - POSTGRES_DB: my_db
+    - POSTGRES_DB: "{{ lookup('env', 'POSTGRES_DB') }}"
     - POSTGRES_USER: ubuntu
     - POSTGRES_PASSWORD: "{{ lookup('env', 'PGPASSWORD') }}"
 
   vars:
     - postgres_root_user: ubuntu
     - postgres_root_pass: "{{ lookup('env', 'PGPASSWORD') }}"
-    - postgres_db_name: my_db
-    - ansible_python_interpreter: /usr/bin/python3
-    - ansible_stdout_callback: yaml
+    - postgres_db_name: "{{ lookup('env', 'POSTGRES_DB') }}"
+    # - ansible_python_interpreter: /usr/bin/python3
+    # - ansible_stdout_callback: yaml
 
 
   roles:
     - setup-postgres
-    # - install-git
 
   handlers:
       # Set up handlers
