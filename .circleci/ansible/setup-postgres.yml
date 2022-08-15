@@ -22,7 +22,7 @@
     - postgres_root_user: ubuntu
     - postgres_root_pass: "{{ lookup('env', 'PGPASSWORD') }}"
     - postgres_db_name: "{{ lookup('env', 'POSTGRES_DB') }}"
-    # - ansible_python_interpreter: /usr/bin/python3
+    - ansible_python_interpreter: /usr/bin/python3
     # - ansible_stdout_callback: yaml
 
 
