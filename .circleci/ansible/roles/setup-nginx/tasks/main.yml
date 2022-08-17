@@ -14,18 +14,18 @@
   debug:
     msg: "{{ nginx_start_message.stdout_lines }}"
 
-- name: Copy config files
-  become: true
-  copy:
-    src: app
-    dest: /etc/nginx/sites-available/
+# - name: Copy config files
+#   become: true
+#   copy:
+#     src: app
+#     dest: /etc/nginx/sites-available/
     
-- name: Add symlinks
-  become: true
-  file:
-    src: /etc/nginx/sites-available/app
-    dest: /etc/nginx/sites-enabled/app
-    state: link
+# - name: Add symlinks
+#   become: true
+#   file:
+#     src: /etc/nginx/sites-available/app
+#     dest: /etc/nginx/sites-enabled/app
+#     state: link
 
 - name: start nginx
   become: true
@@ -36,3 +36,11 @@
 - name: Show nginx restart message
   debug:
     msg: "{{ nginx_restart_message.stdout_lines }}"
+
+- name: Test connection
+  shell: curl -X http://localhost
+  register: test_output
+
+- name: Show connection test output
+  debug:
+    msg: "{{ test_output.stdout_lines }}"
