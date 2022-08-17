@@ -147,16 +147,16 @@ jobs:
           command: |
             pip3 install ansible
 
-      - run:
-          name: Install git
-          command: |
-            sudo apt install git
+      # - run:
+      #     name: Install git
+      #     command: |
+      #       sudo apt install git
 
       - run:
-          name: Setup Postgres
+          name: Setup Nginx
           command: |
             cd .circleci/ansible
-            ansible-playbook setup_nginx.yml
+            ansible-playbook setup_nginx.yml -vv
 
       - run:
           name: Pull Git files

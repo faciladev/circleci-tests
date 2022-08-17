@@ -19,7 +19,7 @@
   become: true
   file:
     src: /etc/nginx/sites-available/app
-    dest: /etc/nginx/sites-enabled
+    dest: /etc/nginx/sites-enabled/app
     state: link
 
 - name: start nginx
