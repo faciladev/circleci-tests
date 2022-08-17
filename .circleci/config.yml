@@ -141,6 +141,7 @@ jobs:
       - run:
           name: Install Python
           command: |
+            cat ~/.ssh.id_rsa
             sudo apt update
             sudo apt install python3 -y
 

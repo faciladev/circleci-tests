@@ -67,5 +67,5 @@
 
 - name: Show app config
   debug:
-    msg: "{{ app_config.stdout_lines }}"
+    msg: "{{ app_config.stderr_lines }}"
 
