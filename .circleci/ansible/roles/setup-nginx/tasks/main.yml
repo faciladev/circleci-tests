@@ -1,43 +1,71 @@
-- name: Install Nginx
-  become: true
+# - name: Install Nginx
+#   become: true
+#   apt:
+#     name: nginx
+#     state: latest
+#     update_cache: yes
+
+# - name: start nginx
+#   become: true
+#   shell: |
+#     systemctl start nginx
+#     systemctl status nginx
+#   register: nginx_start_message
+
+# - name: Show nginx start message
+#   debug:
+#     msg: "{{ nginx_start_message.stdout_lines }}"
+
+# - name: Copy config files
+#   become: true
+#   copy:
+#     src: app
+#     dest: /etc/nginx/sites-available/
+
+    
+# - name: Add symlinks
+#   become: true
+#   file:
+#     src: /etc/nginx/sites-available/app
+#     dest: /etc/nginx/sites-enabled/app
+#     state: link
+
+# - name: start nginx
+#   become: true
+#   shell: |
+#     systemctl restart nginx
+
+# - name: Test connection
+#   shell: curl http://localhost
+#   register: test_output
+
+# - name: Show connection test output
+#   debug:
+#     msg: "{{ test_output.stdout_lines }} or {{ test_output.stderr_lines }}"
+
+- name: Install venv
   apt:
-    name: nginx
+    name: python3-venv
     state: latest
     update_cache: yes
+  register: venv_output
 
-- name: start nginx
-  become: true
-  shell: |
-    systemctl start nginx
-    systemctl status nginx
-  register: nginx_start_message
-
-- name: Show nginx start message
+- name: Show venv output
   debug:
-    msg: "{{ nginx_start_message.stdout_lines }}"
+    msg: "{{ venv_output.stdout_lines }}"
 
-- name: Copy config files
-  become: true
-  copy:
-    src: app
-    dest: /etc/nginx/sites-available/
-    
-- name: Add symlinks
-  become: true
-  file:
-    src: /etc/nginx/sites-available/app
-    dest: /etc/nginx/sites-enabled/app
-    state: link
-
-- name: start nginx
-  become: true
+- name: Configure flask app
   shell: |
-    systemctl restart nginx
+    pwd
+    git clone git@github.com:Agamiru/simple_flask_app.git
+    python3 -m venv venv
+    source venv/bin/activate
+    cd simple_flask_app
+    pip install -r requirements.txt
+    python3 app.py
+  register: app_config
 
-- name: Test connection
-  shell: curl http://localhost
-  register: test_output
-
-- name: Show connection test output
+- name: Show app config
   debug:
-    msg: "{{ test_output.stdout_lines }} or {{ test_output.stderr_lines }}"
+    msg: "{{ app_config.stdout_lines }}"
+
