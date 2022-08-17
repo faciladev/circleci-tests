@@ -55,7 +55,7 @@
     source venv/bin/activate
     cd simple_flask_app
     pip install -r requirements.txt
-    gunicorn app:app --daemon
+    gunicorn app:ap --daemon
   args:
     executable: /bin/bash
   register: app_config
