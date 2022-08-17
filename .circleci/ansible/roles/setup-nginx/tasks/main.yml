@@ -1,47 +1,40 @@
-# - name: Install Nginx
-#   become: true
-#   apt:
-#     name: nginx
-#     state: latest
-#     update_cache: yes
+- name: Install Nginx
+  become: true
+  apt:
+    name: nginx
+    state: latest
+    update_cache: yes
 
-# - name: start nginx
-#   become: true
-#   shell: |
-#     systemctl start nginx
-#     systemctl status nginx
-#   register: nginx_start_message
+- name: start nginx
+  become: true
+  shell: |
+    systemctl start nginx
+    systemctl status nginx
+  register: nginx_start_message
 
-# - name: Show nginx start message
-#   debug:
-#     msg: "{{ nginx_start_message.stdout_lines }}"
+- name: Show nginx start message
+  debug:
+    msg: "{{ nginx_start_message.stdout_lines }}"
 
-# - name: Copy config files
-#   become: true
-#   copy:
-#     src: app
-#     dest: /etc/nginx/sites-available/
+- name: Copy config files
+  become: true
+  copy:
+    src: app
+    dest: /etc/nginx/sites-available/
 
     
-# - name: Add symlinks
-#   become: true
-#   file:
-#     src: /etc/nginx/sites-available/app
-#     dest: /etc/nginx/sites-enabled/app
-#     state: link
+- name: Add symlinks
+  become: true
+  file:
+    src: /etc/nginx/sites-available/app
+    dest: /etc/nginx/sites-enabled/app
+    state: link
 
-# - name: start nginx
-#   become: true
-#   shell: |
-#     systemctl restart nginx
+- name: start nginx
+  become: true
+  shell: |
+    systemctl restart nginx
 
-# - name: Test connection
-#   shell: curl http://localhost
-#   register: test_output
-
-# - name: Show connection test output
-#   debug:
-#     msg: "{{ test_output.stdout_lines }} or {{ test_output.stderr_lines }}"
 
 - name: Install venv
   apt:
@@ -64,4 +57,12 @@
 - name: Show app config
   debug:
     msg: "{{ app_config.stdout_lines }}"
+
+- name: Test connection
+  shell: curl http://localhost
+  register: test_output
+
+- name: Show connection test output
+  debug:
+    msg: "{{ test_output.stdout_lines }} or {{ test_output.stderr_lines }}"
 
