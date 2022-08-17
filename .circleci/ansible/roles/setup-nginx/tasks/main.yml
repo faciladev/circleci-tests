@@ -58,6 +58,7 @@
     # cd simple_flask_app
     # pip install -r requirements.txt
     # python3 app.py
+  executable: /bin/bash
   register: app_config
 
 - name: Show app config
