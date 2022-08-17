@@ -8,6 +8,11 @@
 - name: start nginx
   shell: |
     sudo systemctl start nginx
+  register: nginx_start_message
+
+- name: Show nginx start message
+  debug:
+    msg: {{ nginx_start_message.stdout_lines }}
 
 - name: Copy config files
   become: true
@@ -26,3 +31,8 @@
   become: true
   shell: |
     systemctl restart nginx
+  register: nginx_restart_message
+
+- name: Show nginx restart message
+  debug:
+    msg: {{ nginx_restart_message.stdout_lines }}

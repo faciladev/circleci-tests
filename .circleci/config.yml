@@ -158,10 +158,10 @@ jobs:
             cd .circleci/ansible
             ansible-playbook setup_nginx.yml -vv
 
-      - run:
-          name: Pull Git files
-          command: |
-            git clone -b staging https://github.com/richoak/payments_app.git
+      # - run:
+      #     name: Pull Git files
+      #     command: |
+      #       git clone -b staging https://github.com/richoak/payments_app.git
 
       # - run:
       #     name: Setup Server
