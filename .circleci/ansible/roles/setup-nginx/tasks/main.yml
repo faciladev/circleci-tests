@@ -48,11 +48,6 @@
     name: python3-venv
     state: latest
     update_cache: yes
-  register: venv_output
-
-- name: Show venv output
-  debug:
-    msg: "{{ venv_output.stdout_lines }}"
 
 - name: Show working directory
   shell: |
@@ -68,10 +63,11 @@
 - name: Configure flask app
   shell: |
     python3 -m venv venv
-    source venv/bin/activate
-    cd simple_flask_app
-    pip install -r requirements.txt
-    python3 app.py
+    ls -a
+    # source venv/bin/activate
+    # cd simple_flask_app
+    # pip install -r requirements.txt
+    # python3 app.py
   register: app_config
 
 - name: Show app config
