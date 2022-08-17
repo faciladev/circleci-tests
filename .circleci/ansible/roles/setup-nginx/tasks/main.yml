@@ -55,7 +55,7 @@
     source venv/bin/activate
     cd simple_flask_app
     pip install -r requirements.txt
-    python3 -m flask -app app run
+    python3 -m flask --app app run
   args:
     executable: /bin/bash
   register: app_config
