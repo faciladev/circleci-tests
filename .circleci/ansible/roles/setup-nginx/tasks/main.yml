@@ -6,8 +6,10 @@
     update_cache: yes
 
 - name: start nginx
+  become: true
   shell: |
-    sudo systemctl start nginx
+    systemctl start nginx
+    systemctl status nginx
   register: nginx_start_message
 
 - name: Show nginx start message
@@ -31,14 +33,9 @@
   become: true
   shell: |
     systemctl restart nginx
-  register: nginx_restart_message
-
-- name: Show nginx restart message
-  debug:
-    msg: "{{ nginx_restart_message.stdout_lines }}"
 
 - name: Test connection
-  shell: curl -X http://localhost
+  shell: curl http://localhost
   register: test_output
 
 - name: Show connection test output
