@@ -136,7 +136,7 @@ jobs:
       image: ubuntu-2204:2022.07.1
     steps:
       - checkout
-      - add_ssh-keys:
+      - add_ssh_keys:
           fingerprints: [e9:c0:a6:a4:ac:ce:92:fd:4d:38:19:09:b5:e0:fc:99]
       - run:
           name: Install Python
