@@ -1,0 +1,28 @@
+- name: Install Nginx
+  become: true
+  apt:
+    name: nginx
+    state: latest
+    update_cache: yes
+
+- name: start nginx
+  shell: |
+    sudo systemctl start nginx
+
+- name: Copy config files
+  become: true
+  copy:
+    src: app
+    dest: /etc/nginx/sites-available/
+    
+- name: Add symlinks
+  become: true
+  file:
+    src: /etc/nginx/sites-available/app
+    dest: /etc/nginx/sites-enabled
+    state: link
+
+- name: start nginx
+  become: true
+  shell: |
+    systemctl restart nginx
