@@ -63,6 +63,7 @@
 - name: Configure flask app
   shell: |
     python3 -m venv venv
+    pwd
     ls -a
     # source venv/bin/activate
     # cd simple_flask_app
