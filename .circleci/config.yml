@@ -139,20 +139,14 @@ jobs:
       - add_ssh_keys:
           fingerprints: [e9:c0:a6:a4:ac:ce:92:fd:4d:38:19:09:b5:e0:fc:99]
       - run:
-          name: Install Python
+          name: Update packages
           command: |
             sudo apt update
-            sudo apt install python3 -y
 
       - run:
           name: Install Ansible
           command: |
             pip3 install ansible
-
-      # - run:
-      #     name: Install git
-      #     command: |
-      #       sudo apt install git
 
       - run:
           name: Setup Nginx
@@ -160,11 +154,6 @@ jobs:
             cd .circleci/ansible
             git clone git@github.com:Agamiru/simple_flask_app.git
             ansible-playbook setup_nginx.yml -vv
-
-      # - run:
-      #     name: Pull Git files
-      #     command: |
-      #       git clone -b staging https://github.com/richoak/payments_app.git
 
       # - run:
       #     name: Setup Server

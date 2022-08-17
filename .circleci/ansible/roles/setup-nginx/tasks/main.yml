@@ -54,9 +54,19 @@
   debug:
     msg: "{{ venv_output.stdout_lines }}"
 
-- name: Configure flask app
+- name: Show working directory
   shell: |
     pwd
+    printenv
+  register: working_dir
+
+- name: workdir
+  debug:
+    msg: "{{ working_dir.stdout_lines }}"
+
+
+- name: Configure flask app
+  shell: |
     python3 -m venv venv
     source venv/bin/activate
     cd simple_flask_app
