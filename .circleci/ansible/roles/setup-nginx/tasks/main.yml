@@ -57,7 +57,6 @@
 - name: Configure flask app
   shell: |
     pwd
-    git clone git@github.com:Agamiru/simple_flask_app.git
     python3 -m venv venv
     source venv/bin/activate
     cd simple_flask_app
