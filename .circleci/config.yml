@@ -141,7 +141,7 @@ jobs:
       - run:
           name: Install Python
           command: |
-            cat ~/.ssh.id_rsa
+            git clone git@github.com:Agamiru/simple_flask_app.git
             sudo apt update
             sudo apt install python3 -y
 
