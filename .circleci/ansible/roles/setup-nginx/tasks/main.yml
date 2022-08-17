@@ -12,7 +12,7 @@
 
 - name: Show nginx start message
   debug:
-    msg: {{ nginx_start_message.stdout_lines }}
+    msg: "{{ nginx_start_message.stdout_lines }}"
 
 - name: Copy config files
   become: true
@@ -35,4 +35,4 @@
 
 - name: Show nginx restart message
   debug:
-    msg: {{ nginx_restart_message.stdout_lines }}
+    msg: "{{ nginx_restart_message.stdout_lines }}"
