@@ -1,12 +1,12 @@
 - name: Install Nginx
-  become: true
+  # become: true
   apt:
     name: nginx
     state: latest
     update_cache: yes
 
 - name: start nginx
-  become: true
+  # become: true
   shell: |
     systemctl start nginx
     systemctl status nginx
@@ -17,52 +17,57 @@
     msg: "{{ nginx_start_message.stdout_lines }}"
 
 - name: Copy config files
-  become: true
+  # become: true
   copy:
     src: app
     dest: /etc/nginx/sites-available/
-
     
 - name: Add symlinks
-  become: true
+  # become: true
   file:
     src: /etc/nginx/sites-available/app
     dest: /etc/nginx/sites-enabled/app
     state: link
 
+- name: Remove existing default setting
+  # become: true
+  shell: |
+    rm /etc/nginx/sites-available/default
+    rm /etc/nginx/sites-enabled/default
+    
 - name: start nginx
-  become: true
+  # become: true
   shell: |
     systemctl restart nginx
 
 
-- name: Install venv
-  apt:
-    name: python3-venv
-    state: latest
-    update_cache: yes
+# - name: Install venv
+#   apt:
+#     name: python3-venv
+#     state: latest
+#     update_cache: yes
 
-- name: Configure flask app
-  shell: |
-    python3 -m venv venv
-    source venv/bin/activate
-    cd simple_flask_app
-    pip install -r requirements.txt
-    gunicorn --bind 0.0.0.0:5000 wsgi:app --daemon
+# - name: Configure flask app
+#   shell: |
+#     python3 -m venv venv
+#     source venv/bin/activate
+#     cd simple_flask_app
+#     pip install -r requirements.txt
+#     gunicorn --bind 0.0.0.0:5000 wsgi:app --daemon
 
-  args:
-    executable: /bin/bash
-  register: app_config
+#   args:
+#     executable: /bin/bash
+#   register: app_config
 
-- name: Show app config
-  debug:
-    msg: "{{ app_config.stdout_lines }}"
+# - name: Show app config
+#   debug:
+#     msg: "{{ app_config.stdout_lines }}"
 
-- name: Test connection
-  shell: curl http://localhost
-  register: test_output
+# - name: Test connection
+#   shell: curl http://localhost
+#   register: test_output
 
-- name: Show connection test output
-  debug:
-    msg: "{{ test_output.stdout_lines }} or {{ test_output.stderr_lines }}"
+# - name: Show connection test output
+#   debug:
+#     msg: "{{ test_output.stdout_lines }} or {{ test_output.stderr_lines }}"
 
