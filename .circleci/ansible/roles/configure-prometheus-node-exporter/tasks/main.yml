@@ -28,8 +28,8 @@
 
 - name: start service
   shell: |
-    sudo systemctl start node-exporter
-    sudo systemctl status node-exporter
+    sudo systemctl start node_exporter
+    sudo systemctl status node_exporter
   register: service_output
 
 - name: show service results
