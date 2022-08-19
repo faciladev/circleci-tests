@@ -131,13 +131,35 @@ jobs:
 
 ### CONFIGURING POSTGRES ON DOCKER
 
-  test-nginx:
+  # test-nginx:
+  #   machine:
+  #     image: ubuntu-2204:2022.07.1
+  #   steps:
+  #     - checkout
+  #     - add_ssh_keys:
+  #         fingerprints: [e9:c0:a6:a4:ac:ce:92:fd:4d:38:19:09:b5:e0:fc:99]
+  #     - run:
+  #         name: Update packages
+  #         command: |
+  #           sudo apt update
+
+  #     - run:
+  #         name: Install Ansible
+  #         command: |
+  #           pip3 install ansible
+
+  #     - run:
+  #         name: Setup Nginx
+  #         command: |
+  #           cd .circleci/ansible
+  #           git clone git@github.com:Agamiru/simple_flask_app.git
+  #           ansible-playbook setup_nginx.yml -vv
+
+  machine-plays:
     machine:
       image: ubuntu-2204:2022.07.1
     steps:
       - checkout
-      - add_ssh_keys:
-          fingerprints: [e9:c0:a6:a4:ac:ce:92:fd:4d:38:19:09:b5:e0:fc:99]
       - run:
           name: Update packages
           command: |
@@ -149,11 +171,10 @@ jobs:
             pip3 install ansible
 
       - run:
-          name: Setup Nginx
+          name: Run machine play
           command: |
             cd .circleci/ansible
-            git clone git@github.com:Agamiru/simple_flask_app.git
-            ansible-playbook setup_nginx.yml -vv
+            ansible-playbook machine_plays.yml -vv
 
       # - run:
       #     name: Setup Server
@@ -505,7 +526,8 @@ jobs:
 workflows:
   test-workflow:
     jobs:
-      - test-nginx
+      - machine-plays
+      # - test-nginx
       # - setup-postres-docker
       # - test-user-data
       # - create-prometheus-server

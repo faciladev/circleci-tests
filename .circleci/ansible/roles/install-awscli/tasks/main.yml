@@ -1,0 +1,33 @@
+# Installs awscli and adds it to ~/.bash_aliases so it can be called with 'aws'
+---
+
+- name: Install pip
+  apt:
+    name: python3-pip
+    state: latest
+    update_cache: true
+
+- name: Install awscli
+  shell: |
+    pip isntall awscli
+  args:
+    executable: /bin/bash
+
+- name: Create ~/.bash_aliases
+  shell: |
+    echo "alias aws='~/.local/bin/aws'" > ~/.bash_aliases
+  args:
+    executable: /bin/bash
+
+- name: Tests
+  shell: |
+    source ~/.bashrc
+    aws --version
+  args:
+    executable: /bin/bash
+  register: test_output
+
+- name: Test output
+  debug:
+    msg: "{{ stdout_lines }}""
+

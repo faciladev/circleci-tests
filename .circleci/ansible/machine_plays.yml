@@ -1,6 +1,6 @@
 - name: Set up Nginx
-  hosts: web
-  # connection: local
+  hosts: localhost
+  connection: local
   remote_user: ubuntu
   become: true
   gather_facts: false
@@ -12,4 +12,4 @@
       changed_when: false
 
   roles:
-    - setup-nginx
+    - install-awscli

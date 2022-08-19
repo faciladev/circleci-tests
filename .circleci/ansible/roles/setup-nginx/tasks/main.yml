@@ -1,12 +1,10 @@
 - name: Install Nginx
-  # become: true
   apt:
     name: nginx
     state: latest
     update_cache: yes
 
 - name: start nginx
-  # become: true
   shell: |
     systemctl start nginx
     systemctl status nginx
@@ -17,26 +15,22 @@
     msg: "{{ nginx_start_message.stdout_lines }}"
 
 - name: Copy config files
-  # become: true
   copy:
     src: app
     dest: /etc/nginx/sites-available/
     
 - name: Add symlinks
-  # become: true
   file:
     src: /etc/nginx/sites-available/app
     dest: /etc/nginx/sites-enabled/app
     state: link
 
 - name: Remove existing default setting
-  # become: true
   shell: |
     rm /etc/nginx/sites-available/default
     rm /etc/nginx/sites-enabled/default
     
 - name: start nginx
-  # become: true
   shell: |
     systemctl restart nginx
 
