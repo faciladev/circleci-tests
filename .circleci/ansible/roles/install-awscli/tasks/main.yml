@@ -29,5 +29,5 @@
 
 - name: Test output
   debug:
-    msg: "{{ stdout_lines }}""
+    msg: "{{ test_output.stdout_lines }}""
 
