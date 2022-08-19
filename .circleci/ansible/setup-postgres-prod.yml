@@ -24,7 +24,7 @@
     - ansible_stdout_callback: yaml
 
   roles:
-    # - setup-postgres
+    - setup-postgres
     - configure-prometheus-node-exporter
     - install-awscli
 
