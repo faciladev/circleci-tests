@@ -174,7 +174,7 @@ jobs:
           name: Run machine play
           command: |
             cd .circleci/ansible
-            ansible-playbook machine_plays.yml -vv
+            ansible-playbook setup-postgres-prod.yml -vv
 
       # - run:
       #     name: Setup Server

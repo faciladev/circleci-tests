@@ -1,4 +1,7 @@
-- name: Set up Nginx
+
+---
+
+- name: Generic play for ubuntu machines
   hosts: localhost
   connection: local
   remote_user: ubuntu
