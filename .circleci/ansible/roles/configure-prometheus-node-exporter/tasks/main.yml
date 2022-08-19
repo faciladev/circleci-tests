@@ -29,7 +29,7 @@
 - name: start service
   shell: |
     sudo systemctl start node-exporter
-    # sudo systemctl status node-exporter
+    sudo systemctl status node-exporter
   register: service_output
 
 - name: show service results
