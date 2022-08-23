@@ -18,27 +18,27 @@
   copy:
     src: reverse_proxy
     dest: /etc/nginx/sites-available/
-  when: "{{ proxy_type }}" == "reverse"
+  when: proxy_type == "reverse"
 
 - name: Copy config files (forward)
   copy:
     src: forward_proxy
     dest: /etc/nginx/sites-available/
-  when: "{{ proxy_type }}" == "forward"
+  when: proxy_type == "forward"
     
 - name: Add symlinks (Reverse)
   file:
     src: /etc/nginx/sites-available/reverse_proxy
     dest: /etc/nginx/sites-enabled/reverse_proxy
     state: link
-  when: "{{ proxy_type }}" == "reverse"
+  when: proxy_type == "reverse"
 
 - name: Add symlinks (Forward)
   file:
     src: /etc/nginx/sites-available/forward_proxy
     dest: /etc/nginx/sites-enabled/forward_proxy
     state: link
-  when: "{{ proxy_type }}" == "forward"
+  when: proxy_type == "forward"
 
 - name: Remove existing default setting
   shell: |
