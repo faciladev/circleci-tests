@@ -14,16 +14,31 @@
   debug:
     msg: "{{ nginx_start_message.stdout_lines }}"
 
-- name: Copy config files
+- name: Copy config files (Reverse)
   copy:
-    src: app
+    src: reverse_proxy
     dest: /etc/nginx/sites-available/
+  when: "{{ proxy_type }}" == "reverse"
+
+- name: Copy config files (forward)
+  copy:
+    src: forward_proxy
+    dest: /etc/nginx/sites-available/
+  when: "{{ proxy_type }}" == "forward"
     
-- name: Add symlinks
+- name: Add symlinks (Reverse)
   file:
-    src: /etc/nginx/sites-available/app
-    dest: /etc/nginx/sites-enabled/app
+    src: /etc/nginx/sites-available/reverse_proxy
+    dest: /etc/nginx/sites-enabled/reverse_proxy
     state: link
+  when: "{{ proxy_type }}" == "reverse"
+
+- name: Add symlinks (Forward)
+  file:
+    src: /etc/nginx/sites-available/forward_proxy
+    dest: /etc/nginx/sites-enabled/forward_proxy
+    state: link
+  when: "{{ proxy_type }}" == "forward"
 
 - name: Remove existing default setting
   shell: |
@@ -35,33 +50,33 @@
     systemctl restart nginx
 
 
-# - name: Install venv
-#   apt:
-#     name: python3-venv
-#     state: latest
-#     update_cache: yes
+- name: Install venv
+  apt:
+    name: python3-venv
+    state: latest
+    update_cache: yes
 
-# - name: Configure flask app
-#   shell: |
-#     python3 -m venv venv
-#     source venv/bin/activate
-#     cd simple_flask_app
-#     pip install -r requirements.txt
-#     gunicorn --bind 0.0.0.0:5000 wsgi:app --daemon
+- name: Configure flask app
+  shell: |
+    python3 -m venv venv
+    source venv/bin/activate
+    cd simple_flask_app
+    pip install -r requirements.txt
+    gunicorn --bind 0.0.0.0:5000 wsgi:app --daemon
 
-#   args:
-#     executable: /bin/bash
-#   register: app_config
+  args:
+    executable: /bin/bash
+  register: app_config
 
-# - name: Show app config
-#   debug:
-#     msg: "{{ app_config.stdout_lines }}"
+- name: Show app config
+  debug:
+    msg: "{{ app_config.stdout_lines }}"
 
-# - name: Test connection
-#   shell: curl http://localhost
-#   register: test_output
+- name: Test connection
+  shell: curl http://localhost
+  register: test_output
 
-# - name: Show connection test output
-#   debug:
-#     msg: "{{ test_output.stdout_lines }} or {{ test_output.stderr_lines }}"
+- name: Show connection test output
+  debug:
+    msg: "{{ test_output.stdout_lines }} or {{ test_output.stderr_lines }}"
 

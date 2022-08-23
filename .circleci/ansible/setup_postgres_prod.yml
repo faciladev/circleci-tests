@@ -1,8 +1,8 @@
 ---
 
 - name: Set up postgres
-  hosts: localhost
-  connection: local
+  hosts: web
+  # connection: local
   remote_user: ubuntu
   become: true
   gather_facts: false

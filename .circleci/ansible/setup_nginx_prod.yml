@@ -1,7 +1,8 @@
+---
+
 - name: Set up Nginx
-  # hosts: web
-  hosts: localhost
-  connection: local
+  hosts: web
+  # connection: local
   remote_user: ubuntu
   become: true
   gather_facts: false
@@ -12,8 +13,7 @@
       raw: test -e /usr/bin/python3 || (apt -y update && apt install -y python3)
       changed_when: false
 
-  vars:
-    proxy_type: reverse
-
   roles:
     - setup-nginx
+    - configure-prometheus-node-exporter
+    - install-awscli
