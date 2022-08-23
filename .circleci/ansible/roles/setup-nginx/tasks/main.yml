@@ -50,45 +50,45 @@
     systemctl restart nginx
 
 
-# Test for reverse proxy
-- name: Install venv
-  apt:
-    name: python3-venv
-    state: latest
-    update_cache: yes
-  when: proxy_type == "reverse"
+# # Test for reverse proxy
+# - name: Install venv
+#   apt:
+#     name: python3-venv
+#     state: latest
+#     update_cache: yes
+#   when: proxy_type == "reverse"
 
-- name: Configure flask app
-  shell: |
-    python3 -m venv venv
-    source venv/bin/activate
-    cd simple_flask_app
-    pip install -r requirements.txt
-    gunicorn --bind 0.0.0.0:5000 wsgi:app --daemon
-  when: proxy_type == "reverse"
-  args:
-    executable: /bin/bash
-  register: app_config
+# - name: Configure flask app
+#   shell: |
+#     python3 -m venv venv
+#     source venv/bin/activate
+#     cd simple_flask_app
+#     pip install -r requirements.txt
+#     gunicorn --bind 0.0.0.0:5000 wsgi:app --daemon
+#   when: proxy_type == "reverse"
+#   args:
+#     executable: /bin/bash
+#   register: app_config
 
-- name: Show app config
-  debug:
-    msg: "{{ app_config.stdout_lines }}"
-  when: proxy_type == "reverse"
+# - name: Show app config
+#   debug:
+#     msg: "{{ app_config.stdout_lines }}"
+#   when: proxy_type == "reverse"
 
-- name: Test connection
-  shell: curl http://localhost
-  register: test_output
-  when: proxy_type == "reverse"
+# - name: Test connection
+#   shell: curl http://localhost
+#   register: test_output
+#   when: proxy_type == "reverse"
 
-- name: Show connection test output
-  debug:
-    msg: "{{ test_output.stdout_lines }} or {{ test_output.stderr_lines }}"
-  when: proxy_type == "reverse"
+# - name: Show connection test output
+#   debug:
+#     msg: "{{ test_output.stdout_lines }} or {{ test_output.stderr_lines }}"
+#   when: proxy_type == "reverse"
 
 
 # Test for forward proxy
 - name: Test connection
-  shell: curl https://google.com -x localhost:8888
+  shell: curl http://google.com -x localhost:8888
   register: test_output
   when: proxy_type == "forward"
 
